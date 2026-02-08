@@ -1,60 +1,50 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
   <title>Ibrahim Messenger</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
-<!-- AUTH SCREEN -->
-<div id="authScreen">
-  <h1>Ibrahim Messenger</h1>
+<div class="app">
 
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
+  <div class="header">
+    <h2>Ibrahim Messenger</h2>
+    <div id="status"></div>
+    <button onclick="logout()" class="logout">Logout</button>
+  </div>
 
-  <div class="btnRow">
+  <div id="authSection" class="auth">
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
     <button onclick="register()">Register</button>
     <button onclick="login()">Login</button>
   </div>
-</div>
 
+  <div id="chatSection" class="chat-section">
 
-<!-- MAIN APP -->
-<div id="mainApp" class="hidden">
-
-  <div class="topBar">
-    <div>
-      <h2>Ibrahim Messenger</h2>
-      <span id="statusText" class="online">Online</span>
-    </div>
-    <button class="logoutBtn" onclick="logout()">Logout</button>
-  </div>
-
-  <div class="container">
-
-    <!-- CHAT LIST -->
-    <div class="chatList" id="chatList">
-      <h3>Chats</h3>
-      <div id="usersList"></div>
+    <div class="search-bar">
+      <input type="text" id="searchUser" placeholder="Search user by email">
+      <button onclick="searchUser()">Add</button>
+      <button onclick="createGroup()">New Group</button>
     </div>
 
-    <!-- CHAT WINDOW -->
-    <div class="chatWindow">
-      <div id="messages"></div>
+    <div id="chatList" class="chat-list"></div>
 
-      <div class="messageBox">
-        <button class="iconBtn">📷</button>
-        <input type="text" id="messageInput" placeholder="Type a message">
-        <button onclick="sendMessage()">Send</button>
-      </div>
+    <div id="chatBox" class="chat-box"></div>
+
+    <div class="message-input">
+      <button disabled>📷</button>
+      <input type="text" id="messageInput" placeholder="Type message">
+      <button onclick="sendMessage()">Send</button>
     </div>
 
   </div>
-</div>
 
+</div>
 
 <script type="module" src="app.js"></script>
+
 </body>
 </html>
