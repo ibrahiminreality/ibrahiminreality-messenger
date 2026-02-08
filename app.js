@@ -1,69 +1,75 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy } 
-from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  appId: "YOUR_APP_ID"
+  apiKey: "AIzaSyB6xxlmwTb0CWLYP_ONalRsHPEi2h0DnpQ",
+  authDomain: "ibrahiminreality-messenger.firebaseapp.com",
+  projectId: "ibrahiminreality-messenger",
+  storageBucket: "ibrahiminreality-messenger.firebasestorage.app",
+  messagingSenderId: "498261952449",
+  appId: "1:498261952449:web:f72e1a212af2d2022d1140",
+  measurementId: "G-BXGWWZHK6Y"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-const authSection = document.getElementById("auth-section");
-const chatSection = document.getElementById("chat-section");
-const messagesDiv = document.getElementById("messages");
+window.register = function() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  createUserWithEmailAndPassword(auth, email, password)
+    .then(() => alert("Registered Successfully"))
+    .catch(error => alert(error.message));
+}
 
-window.register = async function () {
-  const emailVal = document.getElementById("email").value;
-  const passVal = document.getElementById("password").value;
-  await createUserWithEmailAndPassword(auth, emailVal, passVal);
-};
+window.login = function() {
+  const email = document.getElementById("email").value;
+  const password = document.getElementById("password").value;
+  signInWithEmailAndPassword(auth, email, password)
+    .catch(error => alert(error.message));
+}
 
-window.login = async function () {
-  const emailVal = document.getElementById("email").value;
-  const passVal = document.getElementById("password").value;
-  await signInWithEmailAndPassword(auth, emailVal, passVal);
-};
+window.logout = function() {
+  signOut(auth);
+}
 
-window.logout = async function () {
-  await signOut(auth);
-};
-
-window.sendMessage = async function () {
-  const text = document.getElementById("messageInput").value;
-  if (!text) return;
+window.sendMessage = async function() {
+  const message = document.getElementById("messageInput").value;
+  if(message.trim() === "") return;
 
   await addDoc(collection(db, "messages"), {
-    text: text,
-    uid: auth.currentUser.uid,
+    text: message,
     createdAt: new Date()
   });
 
   document.getElementById("messageInput").value = "";
-};
+}
 
 onAuthStateChanged(auth, user => {
-  if (user) {
-    authSection.style.display = "none";
-    chatSection.style.display = "block";
+  if(user){
+    document.getElementById("loginSection").style.display = "none";
+    document.getElementById("chatSection").style.display = "block";
+    document.getElementById("userStatus").innerText = "Online";
 
     const q = query(collection(db, "messages"), orderBy("createdAt"));
     onSnapshot(q, snapshot => {
-      messagesDiv.innerHTML = "";
+      const chatBox = document.getElementById("chatBox");
+      chatBox.innerHTML = "";
       snapshot.forEach(doc => {
-        const msg = doc.data();
-        messagesDiv.innerHTML += `<div class="message">${msg.text}</div>`;
+        const div = document.createElement("div");
+        div.className = "message";
+        div.innerText = doc.data().text;
+        chatBox.appendChild(div);
       });
     });
 
   } else {
-    authSection.style.display = "block";
-    chatSection.style.display = "none";
+    document.getElementById("loginSection").style.display = "block";
+    document.getElementById("chatSection").style.display = "none";
+    document.getElementById("userStatus").innerText = "";
   }
 });
