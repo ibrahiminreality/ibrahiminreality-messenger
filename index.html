@@ -3,41 +3,57 @@
 <head>
   <meta charset="UTF-8">
   <title>Ibrahim Messenger</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="authScreen" class="center">
-  <h2>Ibrahim Messenger</h2>
-  <input type="email" id="emailInput" placeholder="Email">
-  <input type="password" id="passwordInput" placeholder="Password">
-  <button onclick="register()">Register</button>
-  <button onclick="login()">Login</button>
+<!-- AUTH SCREEN -->
+<div id="authScreen">
+  <h1>Ibrahim Messenger</h1>
+
+  <input type="email" id="email" placeholder="Email">
+  <input type="password" id="password" placeholder="Password">
+
+  <div class="btnRow">
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
+  </div>
 </div>
 
+
+<!-- MAIN APP -->
 <div id="mainApp" class="hidden">
 
-  <div class="sidebar">
-    <div class="topBar">
-      <span>Chats</span>
-      <button onclick="logout()">Logout</button>
+  <div class="topBar">
+    <div>
+      <h2>Ibrahim Messenger</h2>
+      <span id="statusText" class="online">Online</span>
     </div>
-    <div id="chatList"></div>
+    <button class="logoutBtn" onclick="logout()">Logout</button>
   </div>
 
-  <div class="chatArea">
-    <div id="chatHeader" class="chatHeader">Select a chat</div>
-    <div id="messages" class="messages"></div>
+  <div class="container">
 
-    <div class="inputArea">
-      <button disabled>📷</button>
-      <input type="text" id="messageInput" placeholder="Type message">
-      <button onclick="sendMessage()">Send</button>
+    <!-- CHAT LIST -->
+    <div class="chatList" id="chatList">
+      <h3>Chats</h3>
+      <div id="usersList"></div>
     </div>
-  </div>
 
+    <!-- CHAT WINDOW -->
+    <div class="chatWindow">
+      <div id="messages"></div>
+
+      <div class="messageBox">
+        <button class="iconBtn">📷</button>
+        <input type="text" id="messageInput" placeholder="Type a message">
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
+  </div>
 </div>
+
 
 <script type="module" src="app.js"></script>
 </body>
