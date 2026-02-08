@@ -1,1 +1,47 @@
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #ECE5DD;
+}
 
+#auth-section {
+  text-align: center;
+  margin-top: 50px;
+}
+
+input {
+  padding: 10px;
+  width: 80%;
+  margin: 5px;
+}
+
+button {
+  padding: 10px;
+  margin: 5px;
+  background: #25D366;
+  border: none;
+  color: white;
+  width: 85%;
+  border-radius: 5px;
+}
+
+.header {
+  background: #075E54;
+  color: white;
+  padding: 15px;
+  display: flex;
+  justify-content: space-between;
+}
+
+#messages {
+  height: 60vh;
+  overflow-y: scroll;
+  padding: 10px;
+}
+
+.message {
+  background: white;
+  padding: 8px;
+  margin: 5px;
+  border-radius: 5px;
+  }
