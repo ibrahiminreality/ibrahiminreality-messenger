@@ -1,8 +1,7 @@
-console.log("App JS Loaded");
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { getFirestore, collection, addDoc, doc, setDoc, getDocs, query, where, onSnapshot } 
+import { getFirestore, doc, setDoc, getDoc, collection, addDoc, query, where, onSnapshot } 
 from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -11,107 +10,94 @@ const firebaseConfig = {
   projectId: "ibrahiminreality-messenger",
   storageBucket: "ibrahiminreality-messenger.firebasestorage.app",
   messagingSenderId: "498261952449",
-  appId: "1:498261952449:web:f72e1a212af2d2022d1140"
+  appId: "1:498261952449:web:f72e1a212af2d2022d1140",
+  measurementId: "G-BXGWWZHK6Y"
 };
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let currentUser = null;
-let currentChatId = null;
+let currentUser;
+let currentChatId;
 
-// Register
-window.register = async () => {
-  const user = await createUserWithEmailAndPassword(auth, email.value, password.value);
-  await setDoc(doc(db, "users", user.user.uid), { email: email.value });
+window.register = async function () {
+  const email = email.value;
+  const password = password.value;
+
+  const userCred = await createUserWithEmailAndPassword(auth, email, password);
+
+  await setDoc(doc(db, "users", userCred.user.uid), {
+    email: email
+  });
 };
 
-// Login
-window.login = async () => {
+window.login = async function () {
   await signInWithEmailAndPassword(auth, email.value, password.value);
 };
 
-// Logout
-window.logout = async () => {
-  await signOut(auth);
-};
+logoutBtn.onclick = () => signOut(auth);
 
-onAuthStateChanged(auth, (user) => {
-  if(user){
+onAuthStateChanged(auth, user => {
+  if (user) {
     currentUser = user;
-    authBox.classList.add("hidden");
-    app.classList.remove("hidden");
+    authSection.style.display = "none";
+    chatSection.style.display = "block";
+    logoutBtn.style.display = "block";
     loadChats();
   } else {
-    authBox.classList.remove("hidden");
-    app.classList.add("hidden");
+    authSection.style.display = "block";
+    chatSection.style.display = "none";
+    logoutBtn.style.display = "none";
   }
 });
 
-// Add private chat
-window.addUser = async () => {
-  const search = searchEmail.value;
-  const q = query(collection(db,"users"), where("email","==",search));
-  const snap = await getDocs(q);
+window.addUser = async function () {
+  const searchEmail = document.getElementById("searchEmail").value;
 
-  snap.forEach(async docu => {
-    const chatId = [currentUser.uid, docu.id].sort().join("_");
-    await setDoc(doc(db,"chats",chatId),{
-      participants:[currentUser.uid, docu.id],
-      type:"private"
+  const q = query(collection(db, "users"), where("email", "==", searchEmail));
+  onSnapshot(q, snapshot => {
+    snapshot.forEach(docSnap => {
+      const otherUserId = docSnap.id;
+      const chatId = [currentUser.uid, otherUserId].sort().join("_");
+
+      currentChatId = chatId;
+      openChat(chatId);
     });
   });
 };
 
-// Create group
-window.createGroup = async () => {
-  const name = prompt("Group name?");
-  if(!name) return;
-
-  await addDoc(collection(db,"chats"),{
-    participants:[currentUser.uid],
-    type:"group",
-    name:name
-  });
-};
-
-// Load chats
-function loadChats(){
-  const q = query(collection(db,"chats"), where("participants","array-contains",currentUser.uid));
-  onSnapshot(q,snap=>{
-    chatList.innerHTML="";
-    snap.forEach(docu=>{
-      const div=document.createElement("div");
-      div.className="chat-item";
-      div.innerText=docu.data().name || "Private Chat";
-      div.onclick=()=>openChat(docu.id);
-      chatList.appendChild(div);
-    });
-  });
+function loadChats() {
+  // simple demo load
 }
 
-// Open chat
-function openChat(id){
-  currentChatId=id;
-  onSnapshot(collection(db,"chats",id,"messages"),snap=>{
-    messages.innerHTML="";
-    snap.forEach(docu=>{
-      const msg=docu.data();
-      const div=document.createElement("div");
-      div.className="message "+(msg.uid===currentUser.uid?"sent":"received");
-      div.innerText=msg.text;
+function openChat(chatId) {
+  chatBox.style.display = "block";
+  messages.innerHTML = "";
+
+  const q = collection(db, "chats", chatId, "messages");
+
+  onSnapshot(q, snapshot => {
+    messages.innerHTML = "";
+    snapshot.forEach(doc => {
+      const msg = doc.data();
+      const div = document.createElement("div");
+      div.className = "message";
+      div.innerText = msg.text;
       messages.appendChild(div);
     });
   });
 }
 
-// Send message
-window.sendMessage = async () => {
-  if(!currentChatId) return;
-  await addDoc(collection(db,"chats",currentChatId,"messages"),{
-    text:messageInput.value,
-    uid:currentUser.uid
+window.sendMessage = async function () {
+  const text = messageInput.value;
+  if (!text) return;
+
+  await addDoc(collection(db, "chats", currentChatId, "messages"), {
+    text: text,
+    sender: currentUser.uid,
+    timestamp: Date.now()
   });
-  messageInput.value="";
+
+  messageInput.value = "";
 };
