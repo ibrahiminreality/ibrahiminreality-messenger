@@ -8,27 +8,35 @@
 </head>
 <body>
 
-<div class="header">
-  <span>Ibrahim Messenger</span>
-  <span id="userStatus" class="status"></span>
-  <button onclick="logout()" class="logout-btn">Logout</button>
-</div>
-
-<div id="loginSection" class="login-box">
-  <h3>Login / Register</h3>
-  <input type="email" id="email" placeholder="Email"><br><br>
-  <input type="password" id="password" placeholder="Password"><br><br>
+<div id="authScreen" class="center">
+  <h2>Ibrahim Messenger</h2>
+  <input type="email" id="emailInput" placeholder="Email">
+  <input type="password" id="passwordInput" placeholder="Password">
   <button onclick="register()">Register</button>
   <button onclick="login()">Login</button>
 </div>
 
-<div id="chatSection" style="display:none;">
-  <div id="chatBox" class="chat-box"></div>
+<div id="mainApp" class="hidden">
 
-  <div class="input-area">
-    <input type="text" id="messageInput" placeholder="Type a message">
-    <button onclick="sendMessage()">Send</button>
+  <div class="sidebar">
+    <div class="topBar">
+      <span>Chats</span>
+      <button onclick="logout()">Logout</button>
+    </div>
+    <div id="chatList"></div>
   </div>
+
+  <div class="chatArea">
+    <div id="chatHeader" class="chatHeader">Select a chat</div>
+    <div id="messages" class="messages"></div>
+
+    <div class="inputArea">
+      <button disabled>📷</button>
+      <input type="text" id="messageInput" placeholder="Type message">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
 </div>
 
 <script type="module" src="app.js"></script>
