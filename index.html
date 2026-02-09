@@ -1,42 +1,62 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Ibrahim Messenger</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
 
-<div id="authBox">
-  <h2>Ibrahim Messenger</h2>
-  <input type="email" id="email" placeholder="Email">
-  <input type="password" id="password" placeholder="Password">
-  <button id="registerBtn">Register</button>
-  <button id="loginBtn">Login</button>
-</div>
+<div class="app">
 
-<div id="appBox" style="display:none;">
-  <div class="topBar">
-    <span id="userEmail"></span>
-    <button id="logoutBtn">Logout</button>
+  <!-- Header -->
+  <div class="header">
+    <h2>Ibrahim Messenger</h2>
+    <button onclick="logout()">Logout</button>
   </div>
 
-  <div class="searchBox">
-    <input type="text" id="searchInput" placeholder="Search by email">
-    <button id="searchBtn">Add Chat</button>
+  <!-- Authentication Section -->
+  <div id="authBox">
+    <input type="email" id="emailInput" placeholder="Enter Email" />
+    <input type="password" id="passwordInput" placeholder="Enter Password" />
+    <button onclick="register()">Register</button>
+    <button onclick="login()">Login</button>
   </div>
 
-  <div id="chatList"></div>
+  <!-- Main App -->
+  <div id="mainApp" style="display:none">
 
-  <div id="chatArea" style="display:none;">
-    <div id="messages"></div>
-    <div class="sendBox">
-      <input type="text" id="messageInput" placeholder="Type message">
-      <button id="sendBtn">Send</button>
+    <!-- Search User -->
+    <div class="searchBox">
+      <input type="text" id="searchEmail" placeholder="Search user by email" />
+      <button onclick="searchUser()">Search</button>
     </div>
+
+    <div id="searchResult"></div>
+
+    <!-- Chat List -->
+    <h3>Your Chats</h3>
+    <div id="chatList"></div>
+
+    <!-- Chat Section -->
+    <div id="chatSection" style="display:none">
+      <h4 id="chatWith"></h4>
+
+      <div id="messages"></div>
+
+      <div class="messageBox">
+        <input type="text" id="messageInput" placeholder="Type a message" />
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
+
   </div>
+
 </div>
 
 <script type="module" src="app.js"></script>
+
 </body>
 </html>
