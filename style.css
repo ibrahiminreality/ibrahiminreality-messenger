@@ -1,33 +1,47 @@
 body {
   margin: 0;
   font-family: Arial;
-  background: #d6cec4;
+  background: #ece5dd;
 }
 
-header {
-  background: #0f5c4d;
-  color: white;
-  padding: 15px;
-  display: flex;
-  justify-content: space-between;
+h2 {
+  text-align: center;
 }
 
 input {
-  display: block;
   width: 90%;
-  margin: 10px auto;
   padding: 10px;
+  margin: 8px auto;
+  display: block;
   border-radius: 20px;
   border: none;
 }
 
 button {
-  margin: 5px;
   padding: 8px 15px;
+  margin: 5px;
   border-radius: 20px;
   border: none;
-  background: #2ecc71;
+  background: #128c7e;
   color: white;
+}
+
+#authBox {
+  text-align: center;
+  margin-top: 60px;
+}
+
+.topBar {
+  background: #075e54;
+  color: white;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.searchBox {
+  padding: 10px;
+  background: white;
 }
 
 #chatList {
@@ -35,14 +49,14 @@ button {
   padding: 10px;
 }
 
-.chatUser {
+.chatItem {
   padding: 10px;
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid #ddd;
   cursor: pointer;
 }
 
 #messages {
-  height: 200px;
+  height: 250px;
   overflow-y: auto;
   background: white;
   padding: 10px;
@@ -50,4 +64,14 @@ button {
 
 .message {
   margin: 5px 0;
+}
+
+.me {
+  text-align: right;
+  color: green;
+}
+
+.sendBox {
+  display: flex;
+  background: white;
 }
