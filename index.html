@@ -1,67 +1,79 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ibrahim Messenger</title>
-  <link rel="stylesheet" href="style.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ibrahim Messenger</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div class="container">
+<!-- LOGIN SECTION -->
+<div id="loginSection" class="authBox">
+  <h2>Login</h2>
+  <input id="loginEmail" placeholder="Email">
+  <input id="loginPassword" type="password" placeholder="Password">
+  <button onclick="login()">Login</button>
 
-  <!-- AUTH SECTION -->
-  <div id="authSection">
+  <p class="linkText" onclick="showRegister()">Register</p>
+  <p class="linkText" onclick="showReset()">Reset Password</p>
+</div>
 
-    <h2>Register</h2>
-    <input id="regName" placeholder="Full Name">
-    <input id="regEmail" placeholder="Email">
-    <input id="regPassword" type="password" placeholder="Password">
-    <button onclick="register()">Register</button>
+<!-- REGISTER SECTION -->
+<div id="registerSection" class="authBox hidden">
+  <h2>Register</h2>
+  <input id="regName" placeholder="Full Name">
+  <input id="regEmail" placeholder="Email">
+  <input id="regPassword" type="password" placeholder="Password">
+  <button onclick="register()">Sign Up</button>
+  <p class="linkText" onclick="showLogin()">Back to Login</p>
+</div>
 
-    <h2>Login</h2>
-    <input id="loginEmail" placeholder="Email">
-    <input id="loginPassword" type="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+<!-- RESET SECTION -->
+<div id="resetSection" class="authBox hidden">
+  <h2>Reset Password</h2>
+  <input id="resetEmail" placeholder="Email">
+  <button onclick="resetPassword()">Send Link</button>
+  <p class="linkText" onclick="showLogin()">Back to Login</p>
+</div>
 
-    <h3>Reset Password</h3>
-    <input id="resetEmail" placeholder="Enter Email">
-    <button onclick="resetPassword()">Send Reset Link</button>
+<!-- CHAT APP -->
+<div id="appSection" class="hidden">
 
+  <!-- TOP BAR -->
+  <div class="topBar">
+    <span onclick="toggleSidebar()">☰</span>
+    <h3>Your Chats</h3>
   </div>
 
-  <!-- CHAT SECTION -->
-  <div id="chatSection" style="display:none;">
+  <!-- SIDEBAR -->
+  <div id="sidebar" class="sidebar">
+    <h3>Profile</h3>
+    <p id="profileName"></p>
+    <input id="newName" placeholder="New Name">
+    <button onclick="updateProfile()">Update Name</button>
 
-    <div class="topBar">
-      <h3>Your Chats</h3>
-      <button id="logoutBtn">Logout</button>
+    <input id="newPassword" type="password" placeholder="New Password">
+    <button onclick="changePassword()">Change Password</button>
+
+    <button class="logoutBtn" onclick="logout()">Sign Out</button>
+  </div>
+
+  <!-- CHAT LIST -->
+  <div class="searchBox">
+    <input id="searchEmail" placeholder="Search by email">
+    <button onclick="searchUser()">Add</button>
+  </div>
+
+  <div id="chatList"></div>
+
+  <!-- CHAT BOX -->
+  <div id="chatBox" class="hidden">
+    <h4 id="chatWith"></h4>
+    <div id="messages"></div>
+    <div class="msgInput">
+      <input id="messageInput" placeholder="Type message">
+      <button onclick="sendMessage()">Send</button>
     </div>
-
-    <div class="searchBox">
-      <input id="searchEmail" placeholder="Search by email">
-      <button onclick="searchUser()">Add</button>
-    </div>
-
-    <div id="chatList"></div>
-
-    <div id="chatBox" style="display:none;">
-      <h4 id="chatWith"></h4>
-      <div id="messages"></div>
-      <div class="msgInput">
-        <input id="messageInput" placeholder="Type message">
-        <button onclick="sendMessage()">Send</button>
-      </div>
-    </div>
-
-    <div class="profileBox">
-      <h3>Edit Profile</h3>
-      <input id="newName" placeholder="New Name">
-      <button onclick="updateProfile()">Update Name</button>
-
-      <input id="newPassword" type="password" placeholder="New Password">
-      <button onclick="changePassword()">Change Password</button>
-    </div>
-
   </div>
 
 </div>
@@ -69,23 +81,23 @@
 <!-- Firebase -->
 
 <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyB6xxlmwTb0CWLYP_ONalRsHPEi2h0DnpQ",
-    authDomain: "ibrahiminreality-messenger.firebaseapp.com",
-    projectId: "ibrahiminreality-messenger",
-    storageBucket: "ibrahiminreality-messenger.firebasestorage.app",
-    messagingSenderId: "498261952449",
-    appId: "1:498261952449:web:f72e1a212af2d2022d1140",
-    measurementId: "G-BXGWWZHK6Y"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyB6xxlmwTb0CWLYP_ONalRsHPEi2h0DnpQ",
+  authDomain: "ibrahiminreality-messenger.firebaseapp.com",
+  projectId: "ibrahiminreality-messenger",
+  storageBucket: "ibrahiminreality-messenger.firebasestorage.app",
+  messagingSenderId: "498261952449",
+  appId: "1:498261952449:web:f72e1a212af2d2022d1140",
+  measurementId: "G-BXGWWZHK6Y"
+};
 
-  const app = initializeApp(firebaseConfig);
-  window.auth = getAuth(app);
-  window.db = getFirestore(app);
+const app = initializeApp(firebaseConfig);
+window.auth = getAuth(app);
+window.db = getFirestore(app);
 </script>
 
 <script type="module" src="app.js"></script>
