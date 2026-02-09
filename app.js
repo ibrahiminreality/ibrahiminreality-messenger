@@ -1,9 +1,11 @@
-import { 
+import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  onAuthStateChanged
+  onAuthStateChanged,
+  updatePassword,
+  sendPasswordResetEmail
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
@@ -26,104 +28,59 @@ const db = window.db;
 let currentUser = null;
 let currentChatId = null;
 
-/* ================= REGISTER ================= */
-
+/* REGISTER */
 window.register = async function () {
-  const name = document.getElementById("regName").value;
-  const email = document.getElementById("regEmail").value;
-  const password = document.getElementById("regPassword").value;
+  const name = regName.value;
+  const email = regEmail.value;
+  const password = regPassword.value;
 
-  if (!name || !email || !password) {
-    alert("All fields required");
-    return;
-  }
+  const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+  const user = userCredential.user;
 
-  try {
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
-
-    await setDoc(doc(db, "users", user.uid), {
-      name: name,
-      email: email,
-      uid: user.uid
-    });
-
-    alert("Registration Successful");
-
-  } catch (error) {
-    alert(error.message);
-  }
-};
-
-/* ================= LOGIN ================= */
-
-window.login = async function () {
-  const email = document.getElementById("loginEmail").value;
-  const password = document.getElementById("loginPassword").value;
-
-  if (!email || !password) {
-    alert("Email & Password required");
-    return;
-  }
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-  } catch (error) {
-    alert(error.message);
-  }
-};
-
-/* ================= LOGOUT ================= */
-
-document.getElementById("logoutBtn").onclick = async function () {
-  await signOut(auth);
-};
-
-/* ================= AUTH STATE ================= */
-
-onAuthStateChanged(auth, async (user) => {
-
-  if (user) {
-    currentUser = user;
-    document.getElementById("authSection").style.display = "none";
-    document.getElementById("chatSection").style.display = "block";
-    document.getElementById("logoutBtn").style.display = "block";
-    loadChats();
-  } else {
-    document.getElementById("authSection").style.display = "block";
-    document.getElementById("chatSection").style.display = "none";
-    document.getElementById("logoutBtn").style.display = "none";
-  }
-
-});
-
-/* ================= SEARCH USER ================= */
-
-window.searchUser = async function () {
-
-  const email = document.getElementById("searchEmail").value;
-
-  const q = query(collection(db, "users"), where("email", "==", email));
-  const snapshot = await getDocs(q);
-
-  if (snapshot.empty) {
-    alert("User not found");
-    return;
-  }
-
-  snapshot.forEach(docSnap => {
-    const userData = docSnap.data();
-    if (docSnap.id === currentUser.uid) return;
-
-    startChat(docSnap.id, userData.name);
+  await setDoc(doc(db, "users", user.uid), {
+    name,
+    email,
+    uid: user.uid
   });
 
+  alert("Registration Successful");
 };
 
-/* ================= START CHAT ================= */
+/* LOGIN */
+window.login = async function () {
+  await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+};
 
+/* LOGOUT */
+logoutBtn.onclick = async () => await signOut(auth);
+
+/* AUTH STATE */
+onAuthStateChanged(auth, user => {
+  if (user) {
+    currentUser = user;
+    authSection.style.display = "none";
+    chatSection.style.display = "block";
+    loadChats();
+  } else {
+    authSection.style.display = "block";
+    chatSection.style.display = "none";
+  }
+});
+
+/* SEARCH USER */
+window.searchUser = async function () {
+  const q = query(collection(db, "users"), where("email", "==", searchEmail.value));
+  const snapshot = await getDocs(q);
+
+  snapshot.forEach(docSnap => {
+    if (docSnap.id !== currentUser.uid) {
+      startChat(docSnap.id, docSnap.data().name);
+    }
+  });
+};
+
+/* START CHAT */
 async function startChat(otherUid, otherName) {
-
   const chatId = [currentUser.uid, otherUid].sort().join("_");
 
   await setDoc(doc(db, "chats", chatId), {
@@ -133,84 +90,82 @@ async function startChat(otherUid, otherName) {
   openChat(chatId, otherName);
 }
 
-/* ================= LOAD CHAT LIST ================= */
-
+/* LOAD CHATS */
 async function loadChats() {
-
   const q = query(collection(db, "chats"),
     where("users", "array-contains", currentUser.uid));
 
   const snapshot = await getDocs(q);
-
-  const chatList = document.getElementById("chatList");
   chatList.innerHTML = "";
 
   for (const docSnap of snapshot.docs) {
-
-    const chatData = docSnap.data();
-    const otherUid = chatData.users.find(uid => uid !== currentUser.uid);
-
+    const otherUid = docSnap.data().users.find(u => u !== currentUser.uid);
     const userDoc = await getDoc(doc(db, "users", otherUid));
-    const userData = userDoc.data();
+    const name = userDoc.data().name;
 
     const div = document.createElement("div");
     div.className = "chatItem";
-    div.innerText = userData.name;  // শুধু নাম দেখাবে
-
-    div.onclick = () => openChat(docSnap.id, userData.name);
+    div.innerText = name;
+    div.onclick = () => openChat(docSnap.id, name);
 
     chatList.appendChild(div);
   }
-
 }
 
-/* ================= OPEN CHAT ================= */
-
+/* OPEN CHAT */
 function openChat(chatId, name) {
-
   currentChatId = chatId;
-  document.getElementById("chatBox").style.display = "block";
-  document.getElementById("chatWith").innerText = name;
+  chatBox.style.display = "block";
+  chatWith.innerText = name;
 
-  const q = query(
-    collection(db, "chats", chatId, "messages"),
-    orderBy("createdAt")
-  );
+  const q = query(collection(db, "chats", chatId, "messages"), orderBy("createdAt"));
 
-  onSnapshot(q, (snapshot) => {
-
-    const messagesDiv = document.getElementById("messages");
-    messagesDiv.innerHTML = "";
+  onSnapshot(q, snapshot => {
+    messages.innerHTML = "";
 
     snapshot.forEach(docSnap => {
-
       const msg = docSnap.data();
       const div = document.createElement("div");
 
       div.className = msg.sender === currentUser.uid ? "msg you" : "msg other";
       div.innerText = msg.text;
 
-      messagesDiv.appendChild(div);
+      messages.appendChild(div);
     });
-
   });
-
 }
 
-/* ================= SEND MESSAGE ================= */
-
+/* SEND MESSAGE */
 window.sendMessage = async function () {
-
-  const text = document.getElementById("messageInput").value;
-
-  if (!text || !currentChatId) return;
+  if (!messageInput.value) return;
 
   await addDoc(collection(db, "chats", currentChatId, "messages"), {
-    text: text,
+    text: messageInput.value,
     sender: currentUser.uid,
     createdAt: new Date()
   });
 
-  document.getElementById("messageInput").value = "";
+  messageInput.value = "";
+};
 
+/* UPDATE NAME */
+window.updateProfile = async function () {
+  await setDoc(doc(db, "users", currentUser.uid), {
+    name: newName.value,
+    email: currentUser.email,
+    uid: currentUser.uid
+  });
+  alert("Name Updated");
+};
+
+/* CHANGE PASSWORD */
+window.changePassword = async function () {
+  await updatePassword(currentUser, newPassword.value);
+  alert("Password Changed");
+};
+
+/* RESET PASSWORD */
+window.resetPassword = async function () {
+  await sendPasswordResetEmail(auth, resetEmail.value);
+  alert("Reset Email Sent");
 };
