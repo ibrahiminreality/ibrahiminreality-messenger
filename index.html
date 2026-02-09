@@ -6,48 +6,40 @@
   <title>Ibrahim Messenger</title>
   <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
 <div class="app">
 
-  <!-- Header -->
   <div class="header">
     <h2>Ibrahim Messenger</h2>
     <button onclick="logout()">Logout</button>
   </div>
 
-  <!-- Authentication Section -->
   <div id="authBox">
-    <input type="email" id="emailInput" placeholder="Enter Email" />
-    <input type="password" id="passwordInput" placeholder="Enter Password" />
+    <input type="email" id="email" placeholder="Email">
+    <input type="password" id="password" placeholder="Password">
     <button onclick="register()">Register</button>
     <button onclick="login()">Login</button>
   </div>
 
-  <!-- Main App -->
   <div id="mainApp" style="display:none">
 
-    <!-- Search User -->
-    <div class="searchBox">
-      <input type="text" id="searchEmail" placeholder="Search user by email" />
+    <div class="search">
+      <input type="text" id="searchEmail" placeholder="Search by email">
       <button onclick="searchUser()">Search</button>
     </div>
 
     <div id="searchResult"></div>
 
-    <!-- Chat List -->
     <h3>Your Chats</h3>
     <div id="chatList"></div>
 
-    <!-- Chat Section -->
     <div id="chatSection" style="display:none">
       <h4 id="chatWith"></h4>
-
       <div id="messages"></div>
 
-      <div class="messageBox">
-        <input type="text" id="messageInput" placeholder="Type a message" />
+      <div class="msgBox">
+        <input type="text" id="messageInput" placeholder="Type message">
         <button onclick="sendMessage()">Send</button>
       </div>
     </div>
@@ -57,6 +49,5 @@
 </div>
 
 <script type="module" src="app.js"></script>
-
 </body>
-</html>
+  </html>
