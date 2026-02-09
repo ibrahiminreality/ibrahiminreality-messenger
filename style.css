@@ -1,90 +1,92 @@
-* {
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-  font-family:Arial, sans-serif;
-}
-
 body {
-  background:#f0f2f5;
-  max-width:500px;
-  margin:auto;
+  margin: 0;
+  font-family: Arial;
+  background: #ece5dd;
 }
 
-.header {
-  background:linear-gradient(135deg,#0f9d58,#34a853);
-  color:white;
-  padding:15px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
+.container {
+  max-width: 500px;
+  margin: auto;
+  background: white;
+  min-height: 100vh;
+  padding: 10px;
 }
 
 input {
-  width:100%;
-  padding:10px;
-  border-radius:20px;
-  border:1px solid #ccc;
-  margin:5px 0;
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  box-sizing: border-box;
 }
 
 button {
-  padding:8px 15px;
-  border:none;
-  border-radius:20px;
-  background:#25d366;
-  color:white;
-  cursor:pointer;
+  padding: 10px;
+  width: 100%;
+  background: #25d366;
+  border: none;
+  color: white;
+  cursor: pointer;
 }
 
-.search {
-  padding:10px;
-  background:white;
+button:hover {
+  opacity: 0.9;
+}
+
+.topBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
 
 #chatList {
-  background:white;
-  padding:10px;
+  margin-top: 10px;
 }
 
 .chatItem {
-  padding:10px;
-  border-bottom:1px solid #eee;
-  cursor:pointer;
+  padding: 10px;
+  background: #f1f1f1;
+  margin-bottom: 5px;
+  cursor: pointer;
+}
+
+.chatItem:hover {
+  background: #ddd;
 }
 
 #messages {
-  height:250px;
-  overflow-y:auto;
-  background:#e5ddd5;
-  padding:10px;
+  height: 300px;
+  overflow-y: auto;
+  background: #e5ddd5;
+  padding: 10px;
+  margin: 10px 0;
 }
 
 .msg {
-  margin-bottom:8px;
-  padding:8px 12px;
-  border-radius:15px;
-  max-width:70%;
+  padding: 8px;
+  margin: 5px;
+  border-radius: 10px;
+  max-width: 70%;
 }
 
 .you {
-  background:#dcf8c6;
-  margin-left:auto;
+  background: #dcf8c6;
+  margin-left: auto;
 }
 
 .other {
-  background:white;
+  background: white;
 }
 
-.msgBox {
-  display:flex;
-  gap:5px;
+.msgInput {
+  display: flex;
 }
 
-/* Dark Mode */
-@media (prefers-color-scheme: dark) {
-  body { background:#121212; color:white; }
-  #chatList { background:#1e1e1e; }
-  #messages { background:#1a1a1a; }
-  .other { background:#2c2c2c; color:white; }
+.msgInput input {
+  flex: 1;
+}
+
+.profileBox {
+  margin-top: 20px;
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
 }
