@@ -1,94 +1,94 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8">
-  <title>Ibrahim Messenger</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <!-- CSS -->
+  <title>Ibrahim Messenger</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js"></script>
 </head>
-
 <body>
 
-  <!-- Header -->
-  <div class="header">
-    <h2>Ibrahim Messenger</h2>
-    <button id="logoutBtn" style="display:none;">Logout</button>
-  </div>
+<div class="container">
 
-  <!-- Auth Section -->
-  <div id="authSection" class="container">
+  <!-- AUTH SECTION -->
+  <div id="authSection">
 
-    <h3>Register</h3>
-    <input type="text" id="regName" placeholder="Full Name">
-    <input type="email" id="regEmail" placeholder="Email">
-    <input type="password" id="regPassword" placeholder="Password">
+    <h2>Register</h2>
+    <input id="regName" placeholder="Full Name">
+    <input id="regEmail" placeholder="Email">
+    <input id="regPassword" type="password" placeholder="Password">
     <button onclick="register()">Register</button>
 
-    <hr>
-
-    <h3>Login</h3>
-    <input type="email" id="loginEmail" placeholder="Email">
-    <input type="password" id="loginPassword" placeholder="Password">
+    <h2>Login</h2>
+    <input id="loginEmail" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Password">
     <button onclick="login()">Login</button>
+
+    <h3>Reset Password</h3>
+    <input id="resetEmail" placeholder="Enter Email">
+    <button onclick="resetPassword()">Send Reset Link</button>
 
   </div>
 
-  <!-- Chat Section -->
-  <div id="chatSection" class="container" style="display:none;">
+  <!-- CHAT SECTION -->
+  <div id="chatSection" style="display:none;">
 
-    <h3>Your Chats</h3>
+    <div class="topBar">
+      <h3>Your Chats</h3>
+      <button id="logoutBtn">Logout</button>
+    </div>
 
-    <input type="text" id="searchEmail" placeholder="Search user by email">
-    <button onclick="searchUser()">Search</button>
+    <div class="searchBox">
+      <input id="searchEmail" placeholder="Search by email">
+      <button onclick="searchUser()">Add</button>
+    </div>
 
     <div id="chatList"></div>
-
-    <hr>
 
     <div id="chatBox" style="display:none;">
       <h4 id="chatWith"></h4>
       <div id="messages"></div>
+      <div class="msgInput">
+        <input id="messageInput" placeholder="Type message">
+        <button onclick="sendMessage()">Send</button>
+      </div>
+    </div>
 
-      <input type="text" id="messageInput" placeholder="Type a message">
-      <button onclick="sendMessage()">Send</button>
+    <div class="profileBox">
+      <h3>Edit Profile</h3>
+      <input id="newName" placeholder="New Name">
+      <button onclick="updateProfile()">Update Name</button>
+
+      <input id="newPassword" type="password" placeholder="New Password">
+      <button onclick="changePassword()">Change Password</button>
     </div>
 
   </div>
 
-  <!-- Firebase Config + JS -->
-  <script type="module">
+</div>
 
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-    import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<!-- Firebase -->
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyB6xxlmwTb0CWLYP_ONalRsHPEi2h0DnpQ",
-      authDomain: "ibrahiminreality-messenger.firebaseapp.com",
-      projectId: "ibrahiminreality-messenger",
-      storageBucket: "ibrahiminreality-messenger.firebasestorage.app",
-      messagingSenderId: "498261952449",
-      appId: "1:498261952449:web:f72e1a212af2d2022d1140",
-      measurementId: "G-BXGWWZHK6Y"
-    };
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
+  const firebaseConfig = {
+    apiKey: "AIzaSyB6xxlmwTb0CWLYP_ONalRsHPEi2h0DnpQ",
+    authDomain: "ibrahiminreality-messenger.firebaseapp.com",
+    projectId: "ibrahiminreality-messenger",
+    storageBucket: "ibrahiminreality-messenger.firebasestorage.app",
+    messagingSenderId: "498261952449",
+    appId: "1:498261952449:web:f72e1a212af2d2022d1140",
+    measurementId: "G-BXGWWZHK6Y"
+  };
 
-    window.auth = auth;
-    window.db = db;
+  const app = initializeApp(firebaseConfig);
+  window.auth = getAuth(app);
+  window.db = getFirestore(app);
+</script>
 
-  </script>
-
-  <script src="app.js" type="module"></script>
+<script type="module" src="app.js"></script>
 
 </body>
 </html>
