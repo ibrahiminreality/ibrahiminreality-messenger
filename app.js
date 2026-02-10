@@ -1,4 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
 import {
   getAuth,
   createUserWithEmailAndPassword,
@@ -12,7 +13,7 @@ import {
   getFirestore,
   doc,
   setDoc,
-  getDocs,
+  getDoc,
   collection,
   addDoc,
   query,
@@ -68,7 +69,6 @@ window.register = async () => {
     );
 
     await setDoc(doc(db, "users", userCred.user.uid), {
-      name: registerName.value,
       email: registerEmail.value,
       online: true,
       lastSeen: serverTimestamp()
@@ -90,10 +90,12 @@ window.resetPassword = async () => {
 
 window.logout = async () => {
 
-  await updateDoc(doc(db, "users", auth.currentUser.uid), {
-    online: false,
-    lastSeen: serverTimestamp()
-  });
+  if (auth.currentUser) {
+    await updateDoc(doc(db, "users", auth.currentUser.uid), {
+      online: false,
+      lastSeen: serverTimestamp()
+    });
+  }
 
   await signOut(auth);
 };
@@ -102,29 +104,43 @@ window.logout = async () => {
 // ================= AUTH STATE =================
 
 onAuthStateChanged(auth, async (user) => {
+
   if (user) {
 
-    await updateDoc(doc(db, "users", user.uid), {
-      online: true,
-      lastSeen: serverTimestamp()
-    });
+    const userRef = doc(db, "users", user.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      await setDoc(userRef, {
+        email: user.email,
+        online: true,
+        lastSeen: serverTimestamp()
+      });
+    } else {
+      await updateDoc(userRef, {
+        online: true,
+        lastSeen: serverTimestamp()
+      });
+    }
 
     authContainer.classList.add("hidden");
     registerContainer.classList.add("hidden");
     resetContainer.classList.add("hidden");
     mainApp.classList.remove("hidden");
+
     loadUsers();
 
   } else {
     mainApp.classList.add("hidden");
     authContainer.classList.remove("hidden");
   }
+
 });
 
 
 // ================= LOAD USERS =================
 
-async function loadUsers() {
+function loadUsers() {
 
   const q = collection(db, "users");
 
@@ -134,29 +150,29 @@ async function loadUsers() {
 
     snapshot.forEach(docSnap => {
 
-      if (docSnap.id !== auth.currentUser.uid) {
+      if (!auth.currentUser) return;
+      if (docSnap.id === auth.currentUser.uid) return;
 
-        const userData = docSnap.data();
-        const div = document.createElement("div");
+      const userData = docSnap.data();
+      const div = document.createElement("div");
 
-        div.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:center;">
-            <span>${userData.email}</span>
-            <span style="
-              width:10px;
-              height:10px;
-              border-radius:50%;
-              background:${userData.online ? '#2ecc71' : '#ccc'};
-            "></span>
-          </div>
-        `;
+      div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span>${userData.email}</span>
+          <span style="
+            width:10px;
+            height:10px;
+            border-radius:50%;
+            background:${userData.online ? '#2ecc71' : '#ccc'};
+          "></span>
+        </div>
+      `;
 
-        div.onclick = () => {
-          openChat(docSnap.id, userData.email);
-        };
+      div.onclick = () => {
+        openChat(docSnap.id, userData.email);
+      };
 
-        userList.appendChild(div);
-      }
+      userList.appendChild(div);
 
     });
 
@@ -168,6 +184,7 @@ async function loadUsers() {
 // ================= OPEN CHAT =================
 
 function openChat(userId, email) {
+
   currentChatUser = userId;
   chatHeader.innerText = email;
 
@@ -182,6 +199,8 @@ function openChat(userId, email) {
 // ================= LOAD MESSAGES =================
 
 function loadMessages() {
+
+  if (!currentChatUser) return;
 
   const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
@@ -214,6 +233,7 @@ function loadMessages() {
     messages.scrollTop = messages.scrollHeight;
 
   });
+
 }
 
 
@@ -222,7 +242,7 @@ function loadMessages() {
 window.sendMessage = async () => {
 
   if (!currentChatUser) return;
-  if (messageInput.value.trim() === "") return;
+  if (!messageInput.value.trim()) return;
 
   const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
