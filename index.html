@@ -6,51 +6,35 @@
 </head>
 <body>
 
-<div id="auth-container" class="center-card">
+<div id="authContainer" class="card">
   <h2>Login</h2>
-  <input type="email" id="loginEmail" placeholder="Email">
-  <input type="password" id="loginPassword" placeholder="Password">
+  <input id="loginEmail" placeholder="Email">
+  <input id="loginPassword" type="password" placeholder="Password">
   <button onclick="login()">Login</button>
-  <p class="link" onclick="showRegister()">Register</p>
-  <p class="link" onclick="showReset()">Reset Password</p>
+  <p onclick="showRegister()">Register</p>
+  <p onclick="showReset()">Reset Password</p>
 </div>
 
-<div id="register-container" class="center-card hidden">
+<div id="registerContainer" class="card hidden">
   <h2>Register</h2>
-  <input type="text" id="registerName" placeholder="Name">
-  <input type="email" id="registerEmail" placeholder="Email">
-  <input type="password" id="registerPassword" placeholder="Password">
+  <input id="registerName" placeholder="Name">
+  <input id="registerEmail" placeholder="Email">
+  <input id="registerPassword" type="password" placeholder="Password">
   <button onclick="register()">Sign Up</button>
-  <p class="link" onclick="showLogin()">Back to Login</p>
+  <p onclick="showLogin()">Back to Login</p>
 </div>
 
-<div id="reset-container" class="center-card hidden">
+<div id="resetContainer" class="card hidden">
   <h2>Reset Password</h2>
-  <input type="email" id="resetEmail" placeholder="Email">
+  <input id="resetEmail" placeholder="Email">
   <button onclick="resetPassword()">Send Reset Link</button>
-  <p class="link" onclick="showLogin()">Back to Login</p>
+  <p onclick="showLogin()">Back to Login</p>
 </div>
 
-<div id="main-app" class="hidden">
-  <div class="sidebar">
-    <h3>Chats</h3>
-    <div id="userList"></div>
-  </div>
-
-  <div class="chat-area">
-    <div class="chat-header">
-      <span id="chatWith"></span>
-      <span id="typingIndicator"></span>
-      <button onclick="logout()">Logout</button>
-    </div>
-
-    <div id="messages"></div>
-
-    <div class="message-input">
-      <input type="text" id="messageInput" placeholder="Type message..."
-        oninput="sendTyping()">
-      <button onclick="sendMessage()">Send</button>
-    </div>
+<div id="mainApp" class="hidden">
+  <div class="card">
+    <h2 id="welcomeText"></h2>
+    <button onclick="logout()">Logout</button>
   </div>
 </div>
 
