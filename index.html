@@ -6,6 +6,7 @@
 </head>
 <body>
 
+<!-- AUTH -->
 <div id="authContainer" class="card">
   <h2>Login</h2>
   <input id="loginEmail" placeholder="Email">
@@ -31,11 +32,24 @@
   <p onclick="showLogin()">Back to Login</p>
 </div>
 
+<!-- MAIN APP -->
 <div id="mainApp" class="hidden">
-  <div class="card">
-    <h2 id="welcomeText"></h2>
+
+  <div class="sidebar">
+    <h3>Users</h3>
+    <div id="userList"></div>
     <button onclick="logout()">Logout</button>
   </div>
+
+  <div class="chatArea">
+    <div id="chatHeader"></div>
+    <div id="messages"></div>
+    <div class="sendBox">
+      <input id="messageInput" placeholder="Type message...">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
+
 </div>
 
 <script type="module" src="app.js"></script>
