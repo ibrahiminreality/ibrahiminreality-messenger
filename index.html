@@ -1,56 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ibrahim Messenger</title>
-<link rel="stylesheet" href="style.css">
+  <title>Messenger 3.0</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- AUTH -->
-<div id="authContainer" class="card">
-<h2>Login</h2>
-<input id="loginEmail" placeholder="Email">
-<input id="loginPassword" type="password" placeholder="Password">
-<button onclick="login()">Login</button>
-<p onclick="showRegister()">Register</p>
-<p onclick="showReset()">Reset Password</p>
+<div id="authContainer" class="auth-box">
+  <h2>Login</h2>
+  <input type="email" id="loginEmail" placeholder="Email">
+  <input type="password" id="loginPassword" placeholder="Password">
+  <button onclick="login()">Login</button>
 </div>
 
-<div id="registerContainer" class="card hidden">
-<h2>Register</h2>
-<input id="registerName" placeholder="Name">
-<input id="registerEmail" placeholder="Email">
-<input id="registerPassword" type="password" placeholder="Password">
-<button onclick="register()">Sign Up</button>
-<p onclick="showLogin()">Back to Login</p>
-</div>
+<div id="mainApp" class="hidden app-container">
 
-<div id="resetContainer" class="card hidden">
-<h2>Reset Password</h2>
-<input id="resetEmail" placeholder="Email">
-<button onclick="resetPassword()">Send Reset Link</button>
-<p onclick="showLogin()">Back to Login</p>
-</div>
+  <div class="sidebar">
+    <h3>Users</h3>
+    <div id="userList"></div>
+    <button onclick="logout()" class="logout-btn">Logout</button>
+  </div>
 
-<!-- MAIN APP -->
-<div id="mainApp" class="hidden">
+  <div class="chat-section">
+    <div class="chat-header">
+      <div id="chatHeader">Select user</div>
+      <div id="typingStatus" class="typing"></div>
+    </div>
 
-<div id="sidebar" class="sidebar">
-<h3>Users</h3>
-<div id="userList"></div>
-<button onclick="logout()">Logout</button>
-</div>
+    <div id="messages" class="messages"></div>
 
-<div id="chatArea" class="chatArea">
-<div id="chatHeader"></div>
-  <div id="typingStatus" style="font-size:14px;color:gray;padding-left:15px;"></div>
-<div id="messages"></div>
-<div class="sendBox">
-<input id="messageInput" placeholder="Type message...">
-<button onclick="sendMessage()">Send</button>
-</div>
-</div>
+    <div class="input-area">
+      <input type="text" id="messageInput" placeholder="Type message..." oninput="typing()">
+      <button onclick="sendMessage()">Send</button>
+    </div>
+  </div>
 
 </div>
 
