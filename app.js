@@ -22,7 +22,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "YOUR_KEY",
+  apiKey: "AIzaSyB6xxlmwTb0CWLYP_ONalRsHPEi2h0DnpQ",
   authDomain: "ibrahiminreality-messenger.firebaseapp.com",
   projectId: "ibrahiminreality-messenger",
   storageBucket: "ibrahiminreality-messenger.firebasestorage.app",
@@ -44,36 +44,39 @@ const userList = document.getElementById("userList");
 const messages = document.getElementById("messages");
 const chatHeader = document.getElementById("chatHeader");
 
-function showSidebar(){
-  document.getElementById("sidebar").style.display = "block";
-  document.getElementById("chatArea").style.display = "none";
-}
-
-function showChat(){
-  document.getElementById("sidebar").style.display = "none";
-  document.getElementById("chatArea").style.display = "flex";
-}
-
 window.login = async () => {
-  await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+  try {
+    await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+  } catch (err) {
+    alert(err.message);
+  }
 };
 
 window.register = async () => {
-  const userCred = await createUserWithEmailAndPassword(
-    auth,
-    registerEmail.value,
-    registerPassword.value
-  );
+  try {
+    const userCred = await createUserWithEmailAndPassword(
+      auth,
+      registerEmail.value,
+      registerPassword.value
+    );
 
-  await setDoc(doc(db, "users", userCred.user.uid), {
-    name: registerName.value,
-    email: registerEmail.value
-  });
+    await setDoc(doc(db, "users", userCred.user.uid), {
+      name: registerName.value,
+      email: registerEmail.value
+    });
+
+  } catch (err) {
+    alert(err.message);
+  }
 };
 
 window.resetPassword = async () => {
-  await sendPasswordResetEmail(auth, resetEmail.value);
-  alert("Reset email sent!");
+  try {
+    await sendPasswordResetEmail(auth, resetEmail.value);
+    alert("Reset email sent!");
+  } catch (err) {
+    alert(err.message);
+  }
 };
 
 window.logout = async () => {
@@ -102,7 +105,6 @@ onAuthStateChanged(auth, async (user) => {
     registerContainer.classList.add("hidden");
     resetContainer.classList.add("hidden");
     mainApp.classList.remove("hidden");
-    showSidebar();
     loadUsers();
   } else {
     mainApp.classList.add("hidden");
@@ -121,7 +123,6 @@ async function loadUsers() {
 
       div.onclick = () => {
         openChat(docSnap.id, docSnap.data().email);
-        showChat();
       };
 
       userList.appendChild(div);
