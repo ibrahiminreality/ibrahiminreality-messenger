@@ -1,56 +1,55 @@
 <!DOCTYPE html>
 <html>
-<head> 
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ibrahim Messenger</title>
-  <link rel="stylesheet" href="style.css">
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ibrahim Messenger</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <!-- AUTH -->
 <div id="authContainer" class="card">
-  <h2>Login</h2>
-  <input id="loginEmail" placeholder="Email">
-  <input id="loginPassword" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
-  <p onclick="showRegister()">Register</p>
-  <p onclick="showReset()">Reset Password</p>
+<h2>Login</h2>
+<input id="loginEmail" placeholder="Email">
+<input id="loginPassword" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<p onclick="showRegister()">Register</p>
+<p onclick="showReset()">Reset Password</p>
 </div>
 
 <div id="registerContainer" class="card hidden">
-  <h2>Register</h2>
-  <input id="registerName" placeholder="Name">
-  <input id="registerEmail" placeholder="Email">
-  <input id="registerPassword" type="password" placeholder="Password">
-  <button onclick="register()">Sign Up</button>
-  <p onclick="showLogin()">Back to Login</p>
+<h2>Register</h2>
+<input id="registerName" placeholder="Name">
+<input id="registerEmail" placeholder="Email">
+<input id="registerPassword" type="password" placeholder="Password">
+<button onclick="register()">Sign Up</button>
+<p onclick="showLogin()">Back to Login</p>
 </div>
 
 <div id="resetContainer" class="card hidden">
-  <h2>Reset Password</h2>
-  <input id="resetEmail" placeholder="Email">
-  <button onclick="resetPassword()">Send Reset Link</button>
-  <p onclick="showLogin()">Back to Login</p>
+<h2>Reset Password</h2>
+<input id="resetEmail" placeholder="Email">
+<button onclick="resetPassword()">Send Reset Link</button>
+<p onclick="showLogin()">Back to Login</p>
 </div>
 
 <!-- MAIN APP -->
 <div id="mainApp" class="hidden">
-<div class="sidebar" id="sidebar"></div>
-<div class="chatArea" id="chatArea"></div>
-  <div class="sidebar">
-    <h3>Users</h3>
-    <div id="userList"></div>
-    <button onclick="logout()">Logout</button>
-  </div>
 
-  <div class="chatArea">
-    <div id="chatHeader"></div>
-    <div id="messages"></div>
-    <div class="sendBox">
-      <input id="messageInput" placeholder="Type message...">
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
+<div id="sidebar" class="sidebar">
+<h3>Users</h3>
+<div id="userList"></div>
+<button onclick="logout()">Logout</button>
+</div>
+
+<div id="chatArea" class="chatArea">
+<div id="chatHeader"></div>
+<div id="messages"></div>
+<div class="sendBox">
+<input id="messageInput" placeholder="Type message...">
+<button onclick="sendMessage()">Send</button>
+</div>
+</div>
 
 </div>
 
