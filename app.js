@@ -35,7 +35,9 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let currentChatUser = null;
+let unsubscribeMessages = null;
 
+// DOM
 const authContainer = document.getElementById("authContainer");
 const registerContainer = document.getElementById("registerContainer");
 const resetContainer = document.getElementById("resetContainer");
@@ -43,6 +45,8 @@ const mainApp = document.getElementById("mainApp");
 const userList = document.getElementById("userList");
 const messages = document.getElementById("messages");
 const chatHeader = document.getElementById("chatHeader");
+
+// ================= AUTH =================
 
 window.login = async () => {
   try {
@@ -83,6 +87,8 @@ window.logout = async () => {
   await signOut(auth);
 };
 
+// ================= UI SWITCH =================
+
 window.showRegister = () => {
   authContainer.classList.add("hidden");
   registerContainer.classList.remove("hidden");
@@ -99,6 +105,8 @@ window.showReset = () => {
   resetContainer.classList.remove("hidden");
 };
 
+// ================= AUTH STATE =================
+
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     authContainer.classList.add("hidden");
@@ -111,6 +119,8 @@ onAuthStateChanged(auth, async (user) => {
     authContainer.classList.remove("hidden");
   }
 });
+
+// ================= LOAD USERS =================
 
 async function loadUsers() {
   userList.innerHTML = "";
@@ -130,11 +140,20 @@ async function loadUsers() {
   });
 }
 
+// ================= OPEN CHAT =================
+
 function openChat(userId, email) {
   currentChatUser = userId;
   chatHeader.innerText = email;
+
+  if (unsubscribeMessages) {
+    unsubscribeMessages();
+  }
+
   loadMessages();
 }
+
+// ================= LOAD MESSAGES =================
 
 function loadMessages() {
   messages.innerHTML = "";
@@ -146,18 +165,33 @@ function loadMessages() {
     orderBy("createdAt")
   );
 
-  onSnapshot(q, snapshot => {
+  unsubscribeMessages = onSnapshot(q, snapshot => {
     messages.innerHTML = "";
+
     snapshot.forEach(docSnap => {
+      const data = docSnap.data();
       const msg = document.createElement("div");
-      msg.innerText = docSnap.data().text;
+
+      msg.innerText = data.text;
+
+      if (data.sender === auth.currentUser.uid) {
+        msg.classList.add("myMessage");
+      } else {
+        msg.classList.add("otherMessage");
+      }
+
       messages.appendChild(msg);
     });
+
+    messages.scrollTop = messages.scrollHeight;
   });
 }
 
+// ================= SEND MESSAGE =================
+
 window.sendMessage = async () => {
   if (!currentChatUser) return;
+  if (messageInput.value.trim() === "") return;
 
   const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
