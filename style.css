@@ -146,24 +146,39 @@ border-radius:10px;
 }
 /* MESSAGE STYLE */
 
-.my-message {
-  background: #4e73df;
-  color: #ffffff;
-  padding: 10px 15px;
-  border-radius: 15px;
-  margin-bottom: 10px;
-  align-self: flex-end;
-  max-width: 75%;
+/* Chat Background */
+#messages {
+  background: #ece5dd;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
+/* My Message */
+.my-message {
+  background: #25d366;
+  color: #ffffff;
+  padding: 10px 15px;
+  border-radius: 15px 15px 0px 15px;
+  margin-bottom: 8px;
+  align-self: flex-end;
+  max-width: 75%;
+  font-size: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+/* Other Message */
 .other-message {
-  background: #e5e5e5;
+  background: #ffffff;
   color: #000000;
   padding: 10px 15px;
-  border-radius: 15px;
-  margin-bottom: 10px;
+  border-radius: 15px 15px 15px 0px;
+  margin-bottom: 8px;
   align-self: flex-start;
   max-width: 75%;
+  font-size: 15px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
 }
 
 #messages div{
