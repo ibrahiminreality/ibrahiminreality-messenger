@@ -181,3 +181,24 @@ body {
     width: 320px;
   }
 }
+.sidebar{
+  width: 100%;
+}
+
+.chatArea{
+  display: none;
+  flex-direction: column;
+}
+
+@media(min-width: 768px){
+  .sidebar{
+    width: 30%;
+    float: left;
+  }
+
+  .chatArea{
+    display: flex;
+    width: 70%;
+    float: right;
+  }
+    }
