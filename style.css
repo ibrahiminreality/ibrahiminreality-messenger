@@ -1,22 +1,27 @@
 body {
   margin: 0;
-  font-family: Arial;
+  font-family: Arial, sans-serif;
   background: linear-gradient(135deg,#1e3c72,#2a5298);
-  color: white;
 }
 
 .hidden { display: none; }
+
+/* AUTH */
 
 .auth-box {
   width: 300px;
   margin: 100px auto;
   text-align: center;
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.3);
 }
 
 .auth-box input {
   width: 100%;
   padding: 10px;
-  margin: 5px 0;
+  margin: 6px 0;
 }
 
 .auth-box button {
@@ -24,64 +29,93 @@ body {
   padding: 10px;
   background: #2ecc71;
   border: none;
-  color: white;
+  color: black;
   font-weight: bold;
+  cursor: pointer;
 }
+
+/* MAIN APP */
 
 .app-container {
   display: flex;
   height: 100vh;
 }
 
+/* SIDEBAR */
+
 .sidebar {
   width: 30%;
   background: #111;
   padding: 10px;
   overflow-y: auto;
+  color: white;
 }
 
 .sidebar div {
   padding: 10px;
-  margin: 5px 0;
+  margin: 6px 0;
   background: #222;
   cursor: pointer;
   border-radius: 8px;
+  transition: 0.2s;
 }
+
+.sidebar div:hover {
+  background: #333;
+}
+
+/* CHAT */
 
 .chat-section {
   width: 70%;
   display: flex;
   flex-direction: column;
+  background: #ece5dd;
 }
 
 .chat-header {
   padding: 15px;
   background: #000;
+  color: white;
   font-weight: bold;
+}
+
+#typingStatus {
+  font-size: 12px;
+  margin-left: 10px;
+  color: #aaa;
 }
 
 .messages {
   flex: 1;
   padding: 15px;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
+
+/* MESSAGE STYLE */
 
 .my-message {
   background: #2ecc71;
   color: black;
-  padding: 10px;
-  margin: 5px;
-  border-radius: 15px;
+  padding: 10px 14px;
+  margin: 6px;
+  border-radius: 15px 15px 0 15px;
   width: fit-content;
   align-self: flex-end;
+  max-width: 70%;
 }
 
 .other-message {
-  background: #34495e;
-  padding: 10px;
-  margin: 5px;
-  border-radius: 15px;
+  background: #ffffff;
+  color: black;
+  padding: 10px 14px;
+  margin: 6px;
+  border-radius: 15px 15px 15px 0;
   width: fit-content;
+  align-self: flex-start;
+  max-width: 70%;
 }
 
 .input-area {
@@ -101,6 +135,7 @@ body {
   border: none;
   color: black;
   font-weight: bold;
+  cursor: pointer;
 }
 
 .logout-btn {
@@ -110,4 +145,5 @@ body {
   padding: 10px;
   border: none;
   color: white;
+  cursor: pointer;
 }
