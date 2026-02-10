@@ -1,168 +1,162 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import {
-  getAuth,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  signOut,
-  sendPasswordResetEmail,
-  onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-
-import {
-  getFirestore,
-  doc,
-  setDoc,
-  getDoc,
-  collection,
-  addDoc,
-  getDocs,
-  updateDoc,
-  onSnapshot,
-  query,
-  where,
-  orderBy
-} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-
-/* 🔥 YOUR CONFIG */
+// Firebase Config
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
+  apiKey: "AIzaSyB6xxlmwTb0CWLYP_ONalRsHPEi2h0DnpQ",
   authDomain: "ibrahiminreality-messenger.firebaseapp.com",
   projectId: "ibrahiminreality-messenger",
-  storageBucket: "ibrahiminreality-messenger.appspot.com",
+  storageBucket: "ibrahiminreality-messenger.firebasestorage.app",
   messagingSenderId: "498261952449",
-  appId: "1:498261952449:web:f72e1a212af2d2022d1140"
+  appId: "1:498261952449:web:f72e1a212af2d2022d1140",
+  measurementId: "G-BXGWWZHK6Y"
 };
 
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
+firebase.initializeApp(firebaseConfig);
 
-let currentChatId = null;
+const auth = firebase.auth();
+const db = firebase.firestore();
 
+let currentUser = null;
+let currentChatUser = null;
 
-/* =========================
-   SEND MESSAGE
-========================= */
-window.sendMessage = async () => {
-  const text = messageInput.value;
-  if (!text || !currentChatId) return;
-
-  await addDoc(collection(db, "messages"), {
-    chatId: currentChatId,
-    sender: auth.currentUser.uid,
-    text: text,
-    createdAt: new Date(),
-    read: false
-  });
-
-  messageInput.value = "";
-
-  // typing false
-  await updateDoc(doc(db, "chats", currentChatId), {
-    typing: false
-  });
-};
-
-
-/* =========================
-   LOAD MESSAGES REALTIME
-========================= */
-function loadMessages(chatId) {
-
-  const q = query(
-    collection(db, "messages"),
-    where("chatId", "==", chatId),
-    orderBy("createdAt")
-  );
-
-  onSnapshot(q, (snapshot) => {
-    messagesBox.innerHTML = "";
-
-    snapshot.forEach((docSnap) => {
-      const msg = docSnap.data();
-
-      const div = document.createElement("div");
-      div.className = msg.sender === auth.currentUser.uid ? "myMsg" : "otherMsg";
-      div.innerText = msg.text;
-      messagesBox.appendChild(div);
-
-      // mark as read
-      if (msg.sender !== auth.currentUser.uid && !msg.read) {
-        updateDoc(doc(db, "messages", docSnap.id), { read: true });
-      }
-    });
-
-    messagesBox.scrollTop = messagesBox.scrollHeight;
-  });
-}
-
-
-/* =========================
-   TYPING INDICATOR
-========================= */
-window.startTyping = async () => {
-  if (!currentChatId) return;
-
-  await updateDoc(doc(db, "chats", currentChatId), {
-    typing: true
-  });
-};
-
-function listenTyping(chatId) {
-  onSnapshot(doc(db, "chats", chatId), (docSnap) => {
-    const data = docSnap.data();
-    if (!data) return;
-
-    if (data.typing) {
-      typingIndicator.innerText = "Typing...";
-    } else {
-      typingIndicator.innerText = "";
-    }
-  });
-}
-
-
-/* =========================
-   UNREAD COUNTER
-========================= */
-function loadUnreadCounter() {
-
-  const q = query(
-    collection(db, "messages"),
-    where("read", "==", false)
-  );
-
-  onSnapshot(q, (snapshot) => {
-    let count = 0;
-
-    snapshot.forEach((docSnap) => {
-      const msg = docSnap.data();
-      if (msg.sender !== auth.currentUser.uid) {
-        count++;
-      }
-    });
-
-    unreadCounter.innerText = count > 0 ? count : "";
-  });
-}
-
-
-/* =========================
-   OPEN CHAT
-========================= */
-window.openChat = async (chatId) => {
-  currentChatId = chatId;
-  loadMessages(chatId);
-  listenTyping(chatId);
-};
-
-
-/* =========================
-   AUTH STATE
-========================= */
-onAuthStateChanged(auth, (user) => {
+// Auth State
+auth.onAuthStateChanged(user => {
   if (user) {
-    loadUnreadCounter();
+    currentUser = user;
+    setOnlineStatus(true);
+    loadUsers();
   }
 });
+
+// Register
+function register() {
+  const name = document.getElementById("regName").value;
+  const email = document.getElementById("regEmail").value;
+  const password = document.getElementById("regPassword").value;
+
+  auth.createUserWithEmailAndPassword(email, password)
+    .then(res => {
+      return db.collection("users").doc(res.user.uid).set({
+        name: name,
+        email: email,
+        online: true,
+        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+      });
+    })
+    .then(() => {
+      alert("Registered Successfully");
+    })
+    .catch(err => alert(err.message));
+}
+
+// Login
+function login() {
+  const email = document.getElementById("loginEmail").value;
+  const password = document.getElementById("loginPassword").value;
+
+  auth.signInWithEmailAndPassword(email, password)
+    .catch(err => alert(err.message));
+}
+
+// Logout
+function logout() {
+  setOnlineStatus(false);
+  auth.signOut();
+}
+
+// Online Status
+function setOnlineStatus(status) {
+  if (!currentUser) return;
+
+  db.collection("users").doc(currentUser.uid).update({
+    online: status,
+    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+  });
+}
+
+// Load Users
+function loadUsers() {
+  db.collection("users").onSnapshot(snapshot => {
+    const userList = document.getElementById("userList");
+    userList.innerHTML = "";
+
+    snapshot.forEach(doc => {
+      if (doc.id !== currentUser.uid) {
+        const data = doc.data();
+        const div = document.createElement("div");
+        div.className = "user-item";
+
+        const avatarLetter = data.name ? data.name.charAt(0).toUpperCase() : "U";
+        const onlineDot = data.online ? "🟢" : "⚫";
+        const lastSeenText = data.online ? "Online" : "Last seen";
+
+        div.innerHTML = `
+          <div class="avatar">${avatarLetter}</div>
+          <div class="user-info">
+            <div>${onlineDot} ${data.name}</div>
+            <small>${lastSeenText}</small>
+          </div>
+        `;
+
+        div.onclick = () => openChat(doc.id, data.name);
+        userList.appendChild(div);
+      }
+    });
+  });
+}
+
+// Open Chat
+function openChat(uid, name) {
+  currentChatUser = uid;
+  document.getElementById("chatHeader").innerText = name;
+  loadMessages(uid);
+}
+
+// Send Message
+function sendMessage() {
+  const msg = document.getElementById("messageInput").value;
+  if (!msg || !currentChatUser) return;
+
+  const chatId = [currentUser.uid, currentChatUser].sort().join("_");
+
+  db.collection("chats").doc(chatId).collection("messages").add({
+    sender: currentUser.uid,
+    message: msg,
+    timestamp: firebase.firestore.FieldValue.serverTimestamp()
+  });
+
+  document.getElementById("messageInput").value = "";
+}
+
+// Load Messages
+function loadMessages(uid) {
+  const chatId = [currentUser.uid, uid].sort().join("_");
+
+  db.collection("chats").doc(chatId)
+    .collection("messages")
+    .orderBy("timestamp")
+    .onSnapshot(snapshot => {
+      const chatBox = document.getElementById("chatBox");
+      chatBox.innerHTML = "";
+
+      snapshot.forEach(doc => {
+        const data = doc.data();
+        const div = document.createElement("div");
+
+        div.className = data.sender === currentUser.uid
+          ? "message sent"
+          : "message received";
+
+        div.innerText = data.message;
+        chatBox.appendChild(div);
+      });
+
+      chatBox.scrollTop = chatBox.scrollHeight;
+    });
+}
+
+// Reset Password
+function resetPassword() {
+  const email = document.getElementById("resetEmail").value;
+  auth.sendPasswordResetEmail(email)
+    .then(() => alert("Reset Email Sent"))
+    .catch(err => alert(err.message));
+                                  }
