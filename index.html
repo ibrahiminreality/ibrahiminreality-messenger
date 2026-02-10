@@ -1,94 +1,52 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta charset="UTF-8">
   <title>Ibrahim Messenger</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <link rel="stylesheet" href="css/style.css">
-
-  <!-- Firebase -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- AUTH SECTION -->
-<div id="authSection" class="auth-box">
+<div class="auth-container" id="loginBox">
+  <h2>Login</h2>
+  <input type="email" id="loginEmail" placeholder="Email">
+  <input type="password" id="loginPassword" placeholder="Password">
+  <button onclick="login()">Login</button>
 
-  <!-- Login -->
-  <div id="loginBox">
-    <h2>Login</h2>
-    <input type="email" id="loginEmail" placeholder="Email">
-    <input type="password" id="loginPassword" placeholder="Password">
-    <button onclick="login()">Login</button>
-
-    <p onclick="showRegister()" class="link">Register</p>
-    <p onclick="showReset()" class="link">Reset Password</p>
-  </div>
-
-  <!-- Register -->
-  <div id="registerBox" style="display:none;">
-    <h2>Register</h2>
-    <input type="text" id="regName" placeholder="Name">
-    <input type="email" id="regEmail" placeholder="Email">
-    <input type="password" id="regPassword" placeholder="Password">
-    <button onclick="register()">Sign Up</button>
-
-    <p onclick="showLogin()" class="link">Back to Login</p>
-  </div>
-
-  <!-- Reset -->
-  <div id="resetBox" style="display:none;">
-    <h2>Reset Password</h2>
-    <input type="email" id="resetEmail" placeholder="Email">
-    <button onclick="resetPassword()">Send Reset Link</button>
-
-    <p onclick="showLogin()" class="link">Back to Login</p>
-  </div>
-
+  <p class="link" onclick="showRegister()">Register</p>
+  <p class="link" onclick="showReset()">Reset Password</p>
 </div>
 
-<!-- CHAT SECTION -->
-<div id="chatSection" class="container" style="display:none;">
+<div class="auth-container hidden" id="registerBox">
+  <h2>Register</h2>
+  <input type="text" id="registerName" placeholder="Name">
+  <input type="email" id="registerEmail" placeholder="Email">
+  <input type="password" id="registerPassword" placeholder="Password">
+  <button onclick="register()">Sign Up</button>
 
-  <!-- Sidebar -->
-  <div class="sidebar">
-    <h3>Your Chats</h3>
-    <div id="userList"></div>
-    <button onclick="logout()" class="logout-btn">Logout</button>
-  </div>
-
-  <!-- Chat Area -->
-  <div class="chat-area">
-    <div class="chat-header" id="chatHeader">Select User</div>
-    <div id="chatBox" class="chat-box"></div>
-
-    <div class="chat-input">
-      <input type="text" id="messageInput" placeholder="Type message...">
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-
+  <p class="link" onclick="showLogin()">Back to Login</p>
 </div>
 
-<script src="app.js"></script>
+<div class="auth-container hidden" id="resetBox">
+  <h2>Reset Password</h2>
+  <input type="email" id="resetEmail" placeholder="Email">
+  <button onclick="resetPassword()">Send Reset Link</button>
 
-<script>
-function showRegister(){
-  loginBox.style.display="none";
-  registerBox.style.display="block";
-}
-function showLogin(){
-  registerBox.style.display="none";
-  resetBox.style.display="none";
-  loginBox.style.display="block";
-}
-function showReset(){
-  loginBox.style.display="none";
-  resetBox.style.display="block";
-}
-</script>
+  <p class="link" onclick="showLogin()">Back to Login</p>
+</div>
 
+<div id="homePage" class="hidden">
+  <div class="navbar">
+    <h3>Welcome</h3>
+    <button onclick="logout()">Sign Out</button>
+  </div>
+
+  <div class="home-content">
+    <h2>Dashboard</h2>
+    <p>Your profile loaded successfully.</p>
+  </div>
+</div>
+
+<script type="module" src="app.js"></script>
 </body>
 </html>
