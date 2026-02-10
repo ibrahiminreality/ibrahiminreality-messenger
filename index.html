@@ -1,106 +1,78 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ibrahim Messenger</title>
-<link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ibrahim Messenger</title>
+  <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<!-- LOGIN SECTION -->
-<div id="loginSection" class="authBox">
-  <h2>Login</h2>
-  <input id="loginEmail" placeholder="Email">
-  <input id="loginPassword" type="password" placeholder="Password">
-  <button onclick="login()">Login</button>
+<!-- Overlay -->
+<div id="overlay"></div>
 
-  <p class="linkText" onclick="showRegister()">Register</p>
-  <p class="linkText" onclick="showReset()">Reset Password</p>
+<!-- Sidebar -->
+<div id="sidebar">
+  <div class="profile-section">
+    <div class="avatar" id="avatarCircle">I</div>
+    <h3 id="profileName">User</h3>
+    <p id="profileEmail"></p>
+    <p class="status">
+      <span class="dot"></span>
+      <span id="userStatus">Offline</span>
+    </p>
+  </div>
+  <button onclick="logout()">Logout</button>
 </div>
 
-<!-- REGISTER SECTION -->
-<div id="registerSection" class="authBox hidden">
-  <h2>Register</h2>
-  <input id="regName" placeholder="Full Name">
-  <input id="regEmail" placeholder="Email">
-  <input id="regPassword" type="password" placeholder="Password">
-  <button onclick="register()">Sign Up</button>
-  <p class="linkText" onclick="showLogin()">Back to Login</p>
-</div>
+<!-- AUTH SECTION -->
+<div id="authSection">
 
-<!-- RESET SECTION -->
-<div id="resetSection" class="authBox hidden">
-  <h2>Reset Password</h2>
-  <input id="resetEmail" placeholder="Email">
-  <button onclick="resetPassword()">Send Link</button>
-  <p class="linkText" onclick="showLogin()">Back to Login</p>
-</div>
+  <!-- Login (Default Visible) -->
+  <div class="authBox">
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <button onclick="login()">Login</button>
 
-<!-- CHAT APP -->
-<div id="appSection" class="hidden">
-
-  <!-- TOP BAR -->
-  <div class="topBar">
-    <span onclick="toggleSidebar()">☰</span>
-    <h3>Your Chats</h3>
+    <p class="link" onclick="showRegister()">Register</p>
+    <p class="link" onclick="showReset()">Reset Password</p>
   </div>
 
-  <!-- SIDEBAR -->
-  <div id="sidebar" class="sidebar">
-    <h3>Profile</h3>
-    <p id="profileName"></p>
-    <input id="newName" placeholder="New Name">
-    <button onclick="updateProfile()">Update Name</button>
-
-    <input id="newPassword" type="password" placeholder="New Password">
-    <button onclick="changePassword()">Change Password</button>
-
-    <button class="logoutBtn" onclick="logout()">Sign Out</button>
+  <!-- Register -->
+  <div class="authBox hidden" id="registerBox">
+    <h2>Register</h2>
+    <input type="text" id="regName" placeholder="Name">
+    <input type="email" id="regEmail" placeholder="Email">
+    <input type="password" id="regPassword" placeholder="Password">
+    <button onclick="register()">Sign Up</button>
   </div>
 
-  <!-- CHAT LIST -->
+  <!-- Reset -->
+  <div class="authBox hidden" id="resetBox">
+    <h2>Reset Password</h2>
+    <input type="email" id="resetEmail" placeholder="Email">
+    <button onclick="sendReset()">Send Reset Link</button>
+  </div>
+
+</div>
+
+<!-- HOME -->
+<div id="homeSection" class="hidden">
+
+  <div class="topbar">
+    <button onclick="toggleSidebar()">☰</button>
+    <h2>Your Chats</h2>
+  </div>
+
   <div class="searchBox">
-    <input id="searchEmail" placeholder="Search by email">
+    <input type="email" id="searchEmail" placeholder="Search by email">
     <button onclick="searchUser()">Add</button>
   </div>
 
   <div id="chatList"></div>
 
-  <!-- CHAT BOX -->
-  <div id="chatBox" class="hidden">
-    <h4 id="chatWith"></h4>
-    <div id="messages"></div>
-    <div class="msgInput">
-      <input id="messageInput" placeholder="Type message">
-      <button onclick="sendMessage()">Send</button>
-    </div>
-  </div>
-
 </div>
 
-<!-- Firebase -->
-
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-
-const firebaseConfig = {
-  apiKey: "AIzaSyB6xxlmwTb0CWLYP_ONalRsHPEi2h0DnpQ",
-  authDomain: "ibrahiminreality-messenger.firebaseapp.com",
-  projectId: "ibrahiminreality-messenger",
-  storageBucket: "ibrahiminreality-messenger.firebasestorage.app",
-  messagingSenderId: "498261952449",
-  appId: "1:498261952449:web:f72e1a212af2d2022d1140",
-  measurementId: "G-BXGWWZHK6Y"
-};
-
-const app = initializeApp(firebaseConfig);
-window.auth = getAuth(app);
-window.db = getFirestore(app);
-</script>
-
-<script type="module" src="app.js"></script>
-
+<script type="module" src="js/app.js"></script>
 </body>
 </html>
