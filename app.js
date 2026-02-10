@@ -1,4 +1,23 @@
-// Firebase Config
+// Firebase Imports
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { 
+  getAuth, 
+  createUserWithEmailAndPassword, 
+  signInWithEmailAndPassword, 
+  sendPasswordResetEmail, 
+  signOut,
+  onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  getDoc 
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+// 🔥 Your Firebase Config
 const firebaseConfig = {
   apiKey: "AIzaSyB6xxlmwTb0CWLYP_ONalRsHPEi2h0DnpQ",
   authDomain: "ibrahiminreality-messenger.firebaseapp.com",
@@ -9,154 +28,116 @@ const firebaseConfig = {
   measurementId: "G-BXGWWZHK6Y"
 };
 
-firebase.initializeApp(firebaseConfig);
+// Initialize
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
 
-const auth = firebase.auth();
-const db = firebase.firestore();
 
-let currentUser = null;
-let currentChatUser = null;
+// ================= UI Switch =================
 
-// Auth State
-auth.onAuthStateChanged(user => {
-  if (user) {
-    currentUser = user;
-    setOnlineStatus(true);
-    loadUsers();
+window.showRegister = function () {
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("resetBox").classList.add("hidden");
+  document.getElementById("registerBox").classList.remove("hidden");
+};
+
+window.showLogin = function () {
+  document.getElementById("registerBox").classList.add("hidden");
+  document.getElementById("resetBox").classList.add("hidden");
+  document.getElementById("loginBox").classList.remove("hidden");
+};
+
+window.showReset = function () {
+  document.getElementById("loginBox").classList.add("hidden");
+  document.getElementById("registerBox").classList.add("hidden");
+  document.getElementById("resetBox").classList.remove("hidden");
+};
+
+
+// ================= Register =================
+
+window.register = async function () {
+  const name = document.getElementById("registerName").value;
+  const email = document.getElementById("registerEmail").value;
+  const password = document.getElementById("registerPassword").value;
+
+  if (!name || !email || !password) {
+    alert("All fields required!");
+    return;
   }
-});
 
-// Register
-function register() {
-  const name = document.getElementById("regName").value;
-  const email = document.getElementById("regEmail").value;
-  const password = document.getElementById("regPassword").value;
+  try {
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-  auth.createUserWithEmailAndPassword(email, password)
-    .then(res => {
-      return db.collection("users").doc(res.user.uid).set({
-        name: name,
-        email: email,
-        online: true,
-        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-      });
-    })
-    .then(() => {
-      alert("Registered Successfully");
-    })
-    .catch(err => alert(err.message));
-}
+    await setDoc(doc(db, "users", user.uid), {
+      name: name,
+      email: email,
+      createdAt: new Date()
+    });
 
-// Login
-function login() {
+    alert("Registration successful!");
+    showLogin();
+
+  } catch (error) {
+    alert(error.message);
+  }
+};
+
+
+// ================= Login =================
+
+window.login = async function () {
   const email = document.getElementById("loginEmail").value;
   const password = document.getElementById("loginPassword").value;
 
-  auth.signInWithEmailAndPassword(email, password)
-    .catch(err => alert(err.message));
-}
+  try {
+    await signInWithEmailAndPassword(auth, email, password);
+  } catch (error) {
+    alert(error.message);
+  }
+};
 
-// Logout
-function logout() {
-  setOnlineStatus(false);
-  auth.signOut();
-}
 
-// Online Status
-function setOnlineStatus(status) {
-  if (!currentUser) return;
+// ================= Reset Password =================
 
-  db.collection("users").doc(currentUser.uid).update({
-    online: status,
-    lastSeen: firebase.firestore.FieldValue.serverTimestamp()
-  });
-}
-
-// Load Users
-function loadUsers() {
-  db.collection("users").onSnapshot(snapshot => {
-    const userList = document.getElementById("userList");
-    userList.innerHTML = "";
-
-    snapshot.forEach(doc => {
-      if (doc.id !== currentUser.uid) {
-        const data = doc.data();
-        const div = document.createElement("div");
-        div.className = "user-item";
-
-        const avatarLetter = data.name ? data.name.charAt(0).toUpperCase() : "U";
-        const onlineDot = data.online ? "🟢" : "⚫";
-        const lastSeenText = data.online ? "Online" : "Last seen";
-
-        div.innerHTML = `
-          <div class="avatar">${avatarLetter}</div>
-          <div class="user-info">
-            <div>${onlineDot} ${data.name}</div>
-            <small>${lastSeenText}</small>
-          </div>
-        `;
-
-        div.onclick = () => openChat(doc.id, data.name);
-        userList.appendChild(div);
-      }
-    });
-  });
-}
-
-// Open Chat
-function openChat(uid, name) {
-  currentChatUser = uid;
-  document.getElementById("chatHeader").innerText = name;
-  loadMessages(uid);
-}
-
-// Send Message
-function sendMessage() {
-  const msg = document.getElementById("messageInput").value;
-  if (!msg || !currentChatUser) return;
-
-  const chatId = [currentUser.uid, currentChatUser].sort().join("_");
-
-  db.collection("chats").doc(chatId).collection("messages").add({
-    sender: currentUser.uid,
-    message: msg,
-    timestamp: firebase.firestore.FieldValue.serverTimestamp()
-  });
-
-  document.getElementById("messageInput").value = "";
-}
-
-// Load Messages
-function loadMessages(uid) {
-  const chatId = [currentUser.uid, uid].sort().join("_");
-
-  db.collection("chats").doc(chatId)
-    .collection("messages")
-    .orderBy("timestamp")
-    .onSnapshot(snapshot => {
-      const chatBox = document.getElementById("chatBox");
-      chatBox.innerHTML = "";
-
-      snapshot.forEach(doc => {
-        const data = doc.data();
-        const div = document.createElement("div");
-
-        div.className = data.sender === currentUser.uid
-          ? "message sent"
-          : "message received";
-
-        div.innerText = data.message;
-        chatBox.appendChild(div);
-      });
-
-      chatBox.scrollTop = chatBox.scrollHeight;
-    });
-}
-
-// Reset Password
-function resetPassword() {
+window.resetPassword = async function () {
   const email = document.getElementById("resetEmail").value;
-  auth.sendPasswordResetEmail(email)
-    .then(() => alert("Reset Email Sent"))
-    .catch(err => alert(err.message));
-                                  }
+
+  if (!email) {
+    alert("Enter your email");
+    return;
+  }
+
+  try {
+    await sendPasswordResetEmail(auth, email);
+    alert("Reset link sent!");
+    showLogin();
+  } catch (error) {
+    alert(error.message);
+  }
+};
+
+
+// ================= Logout =================
+
+window.logout = async function () {
+  await signOut(auth);
+};
+
+
+// ================= Auth State =================
+
+onAuthStateChanged(auth, async (user) => {
+  if (user) {
+    document.getElementById("loginBox").classList.add("hidden");
+    document.getElementById("registerBox").classList.add("hidden");
+    document.getElementById("resetBox").classList.add("hidden");
+    document.getElementById("homePage").classList.remove("hidden");
+
+  } else {
+    document.getElementById("homePage").classList.add("hidden");
+    showLogin();
+  }
+});
