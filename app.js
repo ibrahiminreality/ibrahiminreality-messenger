@@ -18,7 +18,8 @@ import {
   query,
   orderBy,
   onSnapshot,
-  serverTimestamp
+  serverTimestamp,
+  updateDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -68,7 +69,9 @@ window.register = async () => {
 
     await setDoc(doc(db, "users", userCred.user.uid), {
       name: registerName.value,
-      email: registerEmail.value
+      email: registerEmail.value,
+      online: true,
+      lastSeen: serverTimestamp()
     });
 
   } catch (err) {
@@ -86,6 +89,12 @@ window.resetPassword = async () => {
 };
 
 window.logout = async () => {
+
+  await updateDoc(doc(db, "users", auth.currentUser.uid), {
+    online: false,
+    lastSeen: serverTimestamp()
+  });
+
   await signOut(auth);
 };
 
@@ -94,11 +103,18 @@ window.logout = async () => {
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
+
+    await updateDoc(doc(db, "users", user.uid), {
+      online: true,
+      lastSeen: serverTimestamp()
+    });
+
     authContainer.classList.add("hidden");
     registerContainer.classList.add("hidden");
     resetContainer.classList.add("hidden");
     mainApp.classList.remove("hidden");
     loadUsers();
+
   } else {
     mainApp.classList.add("hidden");
     authContainer.classList.remove("hidden");
@@ -109,21 +125,43 @@ onAuthStateChanged(auth, async (user) => {
 // ================= LOAD USERS =================
 
 async function loadUsers() {
-  userList.innerHTML = "";
-  const querySnapshot = await getDocs(collection(db, "users"));
 
-  querySnapshot.forEach(docSnap => {
-    if (docSnap.id !== auth.currentUser.uid) {
-      const div = document.createElement("div");
-      div.innerText = docSnap.data().email;
+  const q = collection(db, "users");
 
-      div.onclick = () => {
-        openChat(docSnap.id, docSnap.data().email);
-      };
+  onSnapshot(q, (snapshot) => {
 
-      userList.appendChild(div);
-    }
+    userList.innerHTML = "";
+
+    snapshot.forEach(docSnap => {
+
+      if (docSnap.id !== auth.currentUser.uid) {
+
+        const userData = docSnap.data();
+        const div = document.createElement("div");
+
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span>${userData.email}</span>
+            <span style="
+              width:10px;
+              height:10px;
+              border-radius:50%;
+              background:${userData.online ? '#2ecc71' : '#ccc'};
+            "></span>
+          </div>
+        `;
+
+        div.onclick = () => {
+          openChat(docSnap.id, userData.email);
+        };
+
+        userList.appendChild(div);
+      }
+
+    });
+
   });
+
 }
 
 
@@ -153,9 +191,11 @@ function loadMessages() {
   );
 
   unsubscribeMessages = onSnapshot(q, snapshot => {
+
     messages.innerHTML = "";
 
     snapshot.forEach(docSnap => {
+
       const data = docSnap.data();
       const msg = document.createElement("div");
 
@@ -168,9 +208,11 @@ function loadMessages() {
       }
 
       messages.appendChild(msg);
+
     });
 
     messages.scrollTop = messages.scrollHeight;
+
   });
 }
 
@@ -178,6 +220,7 @@ function loadMessages() {
 // ================= SEND MESSAGE =================
 
 window.sendMessage = async () => {
+
   if (!currentChatUser) return;
   if (messageInput.value.trim() === "") return;
 
