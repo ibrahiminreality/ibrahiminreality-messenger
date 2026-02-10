@@ -1,27 +1,27 @@
 body {
   margin: 0;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #4e73df, #1cc88a);
+  font-family: Arial;
+  height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  background: linear-gradient(135deg, #4e73df, #1cc88a);
 }
 
-.auth-container {
+.container {
+  width: 100%;
+  max-width: 350px;
+}
+
+.card {
   background: white;
-  padding: 30px;
-  width: 320px;
+  padding: 25px;
   border-radius: 10px;
   box-shadow: 0 10px 25px rgba(0,0,0,0.2);
   text-align: center;
 }
 
-.auth-container h2 {
-  margin-bottom: 20px;
-}
-
-.auth-container input {
+input {
   width: 100%;
   padding: 10px;
   margin: 8px 0;
@@ -29,7 +29,7 @@ body {
   border: 1px solid #ccc;
 }
 
-.auth-container button {
+button {
   width: 100%;
   padding: 10px;
   background: #4e73df;
@@ -37,38 +37,18 @@ body {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px;
 }
 
-.auth-container button:hover {
+button:hover {
   background: #2e59d9;
 }
 
 .link {
   color: #4e73df;
-  margin-top: 10px;
   cursor: pointer;
+  margin-top: 10px;
 }
 
 .hidden {
   display: none;
-}
-
-#homePage {
-  width: 100%;
-  height: 100vh;
-  background: white;
-}
-
-.navbar {
-  background: #4e73df;
-  color: white;
-  padding: 15px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.home-content {
-  padding: 20px;
 }
