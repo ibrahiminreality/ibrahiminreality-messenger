@@ -150,9 +150,14 @@ border-radius:10px;
 /* Desktop */
 
 @media(min-width:768px){
+#mainApp{
+display:flex;
+}
+
 .sidebar{
 width:30%;
 }
+
 .chatArea{
 display:flex;
 width:70%;
