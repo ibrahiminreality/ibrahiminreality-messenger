@@ -22,13 +22,12 @@ import {
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB6xxlmwTb0CWLYP_ONalRsHPEi2h0DnpQ",
+  apiKey: "YOUR_KEY",
   authDomain: "ibrahiminreality-messenger.firebaseapp.com",
   projectId: "ibrahiminreality-messenger",
   storageBucket: "ibrahiminreality-messenger.firebasestorage.app",
   messagingSenderId: "498261952449",
-  appId: "1:498261952449:web:f72e1a212af2d2022d1140",
-  measurementId: "G-BXGWWZHK6Y"
+  appId: "1:498261952449:web:f72e1a212af2d2022d1140"
 };
 
 const app = initializeApp(firebaseConfig);
@@ -36,6 +35,14 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let currentChatUser = null;
+
+const authContainer = document.getElementById("authContainer");
+const registerContainer = document.getElementById("registerContainer");
+const resetContainer = document.getElementById("resetContainer");
+const mainApp = document.getElementById("mainApp");
+const userList = document.getElementById("userList");
+const messages = document.getElementById("messages");
+const chatHeader = document.getElementById("chatHeader");
 
 function showSidebar(){
   document.getElementById("sidebar").style.display = "block";
@@ -64,9 +71,13 @@ window.register = async () => {
   });
 };
 
+window.resetPassword = async () => {
+  await sendPasswordResetEmail(auth, resetEmail.value);
+  alert("Reset email sent!");
+};
+
 window.logout = async () => {
   await signOut(auth);
-  showSidebar();
 };
 
 window.showRegister = () => {
@@ -120,7 +131,7 @@ async function loadUsers() {
 
 function openChat(userId, email) {
   currentChatUser = userId;
-  document.getElementById("chatUserName").innerText = email;
+  chatHeader.innerText = email;
   loadMessages();
 }
 
