@@ -12,7 +12,12 @@ import {
   getFirestore,
   doc,
   setDoc,
-  updateDoc,
+  getDocs,
+  collection,
+  addDoc,
+  query,
+  orderBy,
+  onSnapshot,
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -30,7 +35,30 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-/* ========= SHOW/HIDE ========= */
+let currentChatUser = null;
+
+/* ========= AUTH ========= */
+
+window.login = async () => {
+  await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
+};
+
+window.register = async () => {
+  const userCred = await createUserWithEmailAndPassword(
+    auth,
+    registerEmail.value,
+    registerPassword.value
+  );
+
+  await setDoc(doc(db, "users", userCred.user.uid), {
+    name: registerName.value,
+    email: registerEmail.value
+  });
+};
+
+window.logout = async () => {
+  await signOut(auth);
+};
 
 window.showRegister = () => {
   authContainer.classList.add("hidden");
@@ -48,57 +76,77 @@ window.showReset = () => {
   resetContainer.classList.remove("hidden");
 };
 
-/* ========= AUTH ========= */
-
-window.login = async () => {
-  await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
-};
-
-window.register = async () => {
-  const userCred = await createUserWithEmailAndPassword(
-    auth,
-    registerEmail.value,
-    registerPassword.value
-  );
-
-  await setDoc(doc(db, "users", userCred.user.uid), {
-    name: registerName.value,
-    email: registerEmail.value,
-    online: true,
-    lastSeen: serverTimestamp()
-  });
-};
-
-window.resetPassword = async () => {
-  await sendPasswordResetEmail(auth, resetEmail.value);
-  alert("Reset link sent");
-};
-
-window.logout = async () => {
-  await updateDoc(doc(db, "users", auth.currentUser.uid), {
-    online: false,
-    lastSeen: serverTimestamp()
-  });
-
-  await signOut(auth);
-};
-
 /* ========= AUTH STATE ========= */
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
-    await updateDoc(doc(db, "users", user.uid), {
-      online: true
-    });
-
     authContainer.classList.add("hidden");
     registerContainer.classList.add("hidden");
     resetContainer.classList.add("hidden");
     mainApp.classList.remove("hidden");
 
-    welcomeText.innerText = "Welcome " + user.email;
+    loadUsers();
   } else {
     mainApp.classList.add("hidden");
     authContainer.classList.remove("hidden");
   }
 });
+
+/* ========= LOAD USERS ========= */
+
+async function loadUsers() {
+  userList.innerHTML = "";
+
+  const querySnapshot = await getDocs(collection(db, "users"));
+
+  querySnapshot.forEach(docSnap => {
+    if (docSnap.id !== auth.currentUser.uid) {
+      const div = document.createElement("div");
+      div.innerText = docSnap.data().email;
+      div.onclick = () => openChat(docSnap.id, docSnap.data().email);
+      userList.appendChild(div);
+    }
+  });
+}
+
+/* ========= CHAT ========= */
+
+function openChat(userId, email) {
+  currentChatUser = userId;
+  chatHeader.innerText = email;
+  loadMessages();
+}
+
+function loadMessages() {
+  messages.innerHTML = "";
+
+  const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+
+  const q = query(
+    collection(db, "chats", chatId, "messages"),
+    orderBy("createdAt")
+  );
+
+  onSnapshot(q, snapshot => {
+    messages.innerHTML = "";
+    snapshot.forEach(docSnap => {
+      const msg = document.createElement("div");
+      msg.innerText = docSnap.data().text;
+      messages.appendChild(msg);
+    });
+  });
+}
+
+window.sendMessage = async () => {
+  if (!currentChatUser) return;
+
+  const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+
+  await addDoc(collection(db, "chats", chatId, "messages"), {
+    text: messageInput.value,
+    sender: auth.currentUser.uid,
+    createdAt: serverTimestamp()
+  });
+
+  messageInput.value = "";
+};
