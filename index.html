@@ -1,133 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Ibrahim Messenger</title>
+  <title>Ibrahim Messenger</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/style.css">
 
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
 </head>
 <body>
 
-<!-- ================= AUTH SECTION ================= -->
+<!-- AUTH SECTION -->
+<div id="authSection" class="auth-box">
 
-<div id="authContainer" class="auth-container">
-
-  <!-- LOGIN (Default Open) -->
-  <div class="auth-box" id="loginBox">
+  <!-- Login -->
+  <div id="loginBox">
     <h2>Login</h2>
-
     <input type="email" id="loginEmail" placeholder="Email">
     <input type="password" id="loginPassword" placeholder="Password">
-
     <button onclick="login()">Login</button>
 
-    <div class="auth-links">
-      <span onclick="showRegister()">Register</span>
-      <span onclick="showReset()">Reset Password</span>
-    </div>
+    <p onclick="showRegister()" class="link">Register</p>
+    <p onclick="showReset()" class="link">Reset Password</p>
   </div>
 
-
-  <!-- REGISTER (Hidden) -->
-  <div class="auth-box hidden" id="registerBox">
+  <!-- Register -->
+  <div id="registerBox" style="display:none;">
     <h2>Register</h2>
-
-    <input type="text" id="registerName" placeholder="Name">
-    <input type="email" id="registerEmail" placeholder="Email">
-    <input type="password" id="registerPassword" placeholder="Password">
-
+    <input type="text" id="regName" placeholder="Name">
+    <input type="email" id="regEmail" placeholder="Email">
+    <input type="password" id="regPassword" placeholder="Password">
     <button onclick="register()">Sign Up</button>
 
-    <div class="auth-links">
-      <span onclick="showLogin()">Back to Login</span>
-    </div>
+    <p onclick="showLogin()" class="link">Back to Login</p>
   </div>
 
-
-  <!-- RESET PASSWORD (Hidden) -->
-  <div class="auth-box hidden" id="resetBox">
+  <!-- Reset -->
+  <div id="resetBox" style="display:none;">
     <h2>Reset Password</h2>
-
     <input type="email" id="resetEmail" placeholder="Email">
     <button onclick="resetPassword()">Send Reset Link</button>
 
-    <div class="auth-links">
-      <span onclick="showLogin()">Back to Login</span>
-    </div>
+    <p onclick="showLogin()" class="link">Back to Login</p>
   </div>
 
 </div>
 
+<!-- CHAT SECTION -->
+<div id="chatSection" class="container" style="display:none;">
 
-<!-- ================= MAIN CHAT SECTION ================= -->
-
-<div id="mainApp" class="main hidden">
-
-  <!-- SIDEBAR -->
+  <!-- Sidebar -->
   <div class="sidebar">
-
-    <div class="sidebar-header">
-      <h2>Your Chats</h2>
-      <button onclick="logout()">Logout</button>
-    </div>
-
-    <input type="text" id="searchUser" placeholder="Search by email">
-    <button onclick="addUser()">Add</button>
-
-    <div id="chatList" class="chat-list"></div>
-
+    <h3>Your Chats</h3>
+    <div id="userList"></div>
+    <button onclick="logout()" class="logout-btn">Logout</button>
   </div>
 
-
-  <!-- CHAT AREA -->
+  <!-- Chat Area -->
   <div class="chat-area">
+    <div class="chat-header" id="chatHeader">Select User</div>
+    <div id="chatBox" class="chat-box"></div>
 
-    <div class="chat-header">
-      <div class="chat-user-info">
-        <div id="chatAvatar" class="avatar">U</div>
-        <div>
-          <div id="chatUserName">User</div>
-          <div id="chatStatus" class="status-text">Offline</div>
-        </div>
-      </div>
-    </div>
-
-    <div id="messagesBox" class="messages"></div>
-
-    <div id="typingIndicator" class="typing"></div>
-
-    <div class="input-area">
-      <input type="text" id="messageInput" placeholder="Type message..." oninput="startTyping()">
+    <div class="chat-input">
+      <input type="text" id="messageInput" placeholder="Type message...">
       <button onclick="sendMessage()">Send</button>
     </div>
-
   </div>
 
 </div>
 
-
-<!-- ================= JS ================= -->
-<script type="module" src="js/app.js"></script>
+<script src="app.js"></script>
 
 <script>
-function showRegister() {
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("registerBox").classList.remove("hidden");
+function showRegister(){
+  loginBox.style.display="none";
+  registerBox.style.display="block";
 }
-
-function showLogin() {
-  document.getElementById("registerBox").classList.add("hidden");
-  document.getElementById("resetBox").classList.add("hidden");
-  document.getElementById("loginBox").classList.remove("hidden");
+function showLogin(){
+  registerBox.style.display="none";
+  resetBox.style.display="none";
+  loginBox.style.display="block";
 }
-
-function showReset() {
-  document.getElementById("loginBox").classList.add("hidden");
-  document.getElementById("resetBox").classList.remove("hidden");
+function showReset(){
+  loginBox.style.display="none";
+  resetBox.style.display="block";
 }
 </script>
 
 </body>
-      </html>
+</html>
