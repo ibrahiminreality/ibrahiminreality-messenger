@@ -9,7 +9,6 @@ import {
 import {
   getFirestore,
   collection,
-  getDocs,
   addDoc,
   query,
   orderBy,
@@ -46,8 +45,7 @@ const messageInput = document.getElementById("messageInput");
 const typingStatus = document.getElementById("typingStatus");
 
 
-// ================= LOGIN =================
-
+// LOGIN
 window.login = async () => {
   await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
 };
@@ -61,9 +59,9 @@ window.logout = async () => {
 };
 
 
-// ================= AUTH STATE =================
-
+// AUTH STATE
 onAuthStateChanged(auth, async (user) => {
+
   if (user) {
 
     await setDoc(doc(db, "users", user.uid), {
@@ -84,8 +82,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 
-// ================= LOAD USERS =================
-
+// LOAD USERS
 function loadUsers() {
 
   onSnapshot(collection(db, "users"), snapshot => {
@@ -100,7 +97,7 @@ function loadUsers() {
         const div = document.createElement("div");
 
         div.innerHTML = `
-          <div style="display:flex;justify-content:space-between;align-items:center;">
+          <div style="display:flex;justify-content:space-between;">
             <span>${user.email}</span>
             <small style="color:${user.online ? '#2ecc71' : '#aaa'}">
               ${user.online ? 'Online' : 'Offline'}
@@ -112,15 +109,12 @@ function loadUsers() {
 
         userList.appendChild(div);
       }
-
     });
-
   });
 }
 
 
-// ================= OPEN CHAT =================
-
+// OPEN CHAT
 function openChat(userId, email) {
 
   currentChatUser = userId;
@@ -132,8 +126,7 @@ function openChat(userId, email) {
 }
 
 
-// ================= LOAD MESSAGES =================
-
+// LOAD MESSAGES
 function loadMessages() {
 
   const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
@@ -156,14 +149,9 @@ function loadMessages() {
 
       if (data.sender === auth.currentUser.uid) {
         msg.classList.add("my-message");
-
-        if (data.seen) {
-          msg.innerHTML += " ✓✓";
-        }
-
+        if (data.seen) msg.innerText += " ✓✓";
       } else {
         msg.classList.add("other-message");
-
         if (!data.seen) {
           await updateDoc(docSnap.ref, { seen: true });
         }
@@ -177,8 +165,7 @@ function loadMessages() {
 }
 
 
-// ================= SEND MESSAGE =================
-
+// SEND MESSAGE
 window.sendMessage = async () => {
 
   if (!currentChatUser) return;
@@ -197,8 +184,7 @@ window.sendMessage = async () => {
 };
 
 
-// ================= TYPING SYSTEM =================
-
+// TYPING SYSTEM
 window.typing = async () => {
 
   if (!currentChatUser) return;
@@ -217,13 +203,10 @@ window.typing = async () => {
 };
 
 
-// ================= LISTEN TYPING =================
-
+// LISTEN TYPING
 onSnapshot(collection(db, "typing"), snapshot => {
 
   snapshot.forEach(docSnap => {
-
-    const data = docSnap.data();
 
     if (!currentChatUser) return;
 
@@ -231,14 +214,13 @@ onSnapshot(collection(db, "typing"), snapshot => {
 
     if (docSnap.id === chatId) {
 
+      const data = docSnap.data();
+
       if (data.user === currentChatUser) {
         typingStatus.innerText = "Typing...";
       } else {
         typingStatus.innerText = "";
       }
-
     }
-
   });
-
 });
