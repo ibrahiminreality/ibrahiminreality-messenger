@@ -58,10 +58,9 @@ cursor:pointer;
 /* MAIN */
 
 #mainApp{
-display:flex;
+display:none;
 height:100vh;
 }
-
 /* SIDEBAR */
 
 .sidebar{
