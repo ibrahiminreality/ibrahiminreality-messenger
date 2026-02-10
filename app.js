@@ -176,7 +176,7 @@ function loadMessages() {
       msg.innerText = data.text;
 
       if (data.sender === auth.currentUser.uid) {
-        msg.classList.add("my-message");
+        msg.classList.add(".mymessage");
       } else {
         msg.classList.add("other-message");
       }
