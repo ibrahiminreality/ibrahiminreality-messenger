@@ -146,18 +146,22 @@ border-radius:10px;
 }
 /* MESSAGE STYLE */
 
-.myMessage{
-background:#4e73df;
-color:black;
-margin-left:auto;
-border-radius:18px 18px 4px 18px;
+.my-message {
+  background: #4f6ef7;
+  color: #ffffff;
+  padding: 10px;
+  border-radius: 12px;
+  margin: 5px;
+  text-align: right;
 }
 
-.otherMessage{
-background:#e4e6eb;
-color:black;
-margin-right:auto;
-border-radius:18px 18px 18px 4px;
+.other-message {
+  background: #e5e5e5;
+  color: #000000;
+  padding: 10px;
+  border-radius: 12px;
+  margin: 5px;
+  text-align: left;
 }
 
 #messages div{
