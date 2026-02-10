@@ -1,12 +1,26 @@
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import {
   getAuth,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   sendPasswordResetEmail,
   signOut,
   onAuthStateChanged
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+import {
+  getFirestore,
+  doc,
+  setDoc,
+  getDoc,
+  updateDoc,
+  collection,
+  addDoc,
+  onSnapshot,
+  query,
+  orderBy,
+  serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyB6xxlmwTb0CWLYP_ONalRsHPEi2h0DnpQ",
@@ -20,55 +34,108 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
+const db = getFirestore(app);
 
-const loginBox = document.getElementById("loginBox");
-const registerBox = document.getElementById("registerBox");
-const resetBox = document.getElementById("resetBox");
-const homeBox = document.getElementById("homeBox");
-const userName = document.getElementById("userName");
+let currentUser = null;
+let selectedUser = null;
 
-function show(box){
-  loginBox.classList.add("hidden");
-  registerBox.classList.add("hidden");
-  resetBox.classList.add("hidden");
-  homeBox.classList.add("hidden");
-  box.classList.remove("hidden");
-}
-
-document.getElementById("goRegister").onclick = () => show(registerBox);
-document.getElementById("goReset").onclick = () => show(resetBox);
-document.getElementById("backLogin1").onclick = () => show(loginBox);
-document.getElementById("backLogin2").onclick = () => show(loginBox);
-
-document.getElementById("registerBtn").onclick = async () => {
-  const email = registerEmail.value;
-  const pass = registerPassword.value;
-  await createUserWithEmailAndPassword(auth, email, pass);
-  alert("Registered Successfully");
-  show(loginBox);
-};
-
-document.getElementById("loginBtn").onclick = async () => {
+window.login = async function () {
   const email = loginEmail.value;
   const pass = loginPassword.value;
   await signInWithEmailAndPassword(auth, email, pass);
 };
 
-document.getElementById("resetBtn").onclick = async () => {
-  const email = resetEmail.value;
-  await sendPasswordResetEmail(auth, email);
-  alert("Reset Link Sent");
+window.register = async function () {
+  const name = registerName.value;
+  const email = registerEmail.value;
+  const pass = registerPassword.value;
+  const userCred = await createUserWithEmailAndPassword(auth, email, pass);
+  await setDoc(doc(db,"users",userCred.user.uid),{
+    name,
+    email,
+    online:true,
+    lastSeen:serverTimestamp()
+  });
 };
 
-document.getElementById("logoutBtn").onclick = async () => {
+window.resetPassword = async function(){
+  await sendPasswordResetEmail(auth, resetEmail.value);
+  alert("Reset sent");
+};
+
+window.logout = async function(){
+  await updateDoc(doc(db,"users",currentUser.uid),{
+    online:false,
+    lastSeen:serverTimestamp()
+  });
   await signOut(auth);
 };
 
-onAuthStateChanged(auth, user => {
+onAuthStateChanged(auth, async user=>{
   if(user){
-    userName.innerText = user.email;
-    show(homeBox);
+    currentUser = user;
+    document.getElementById("auth-container").classList.add("hidden");
+    document.getElementById("main-app").classList.remove("hidden");
+
+    await updateDoc(doc(db,"users",user.uid),{
+      online:true
+    });
+
+    loadUsers();
   } else {
-    show(loginBox);
+    document.getElementById("auth-container").classList.remove("hidden");
+    document.getElementById("main-app").classList.add("hidden");
   }
 });
+
+function loadUsers(){
+  onSnapshot(collection(db,"users"),snap=>{
+    userList.innerHTML="";
+    snap.forEach(docSnap=>{
+      if(docSnap.id!==currentUser.uid){
+        const data=docSnap.data();
+        const div=document.createElement("div");
+        div.className="user-item";
+        div.innerHTML=`
+          <div class="avatar">${data.name[0]}</div>
+          ${data.name}
+          ${data.online?'<div class="online-dot"></div>':''}
+        `;
+        div.onclick=()=>openChat(docSnap.id,data.name);
+        userList.appendChild(div);
+      }
+    });
+  });
+}
+
+function openChat(uid,name){
+  selectedUser=uid;
+  chatWith.innerText=name;
+  loadMessages();
+}
+
+function loadMessages(){
+  const chatId=[currentUser.uid,selectedUser].sort().join("_");
+  const q=query(collection(db,"chats",chatId,"messages"),orderBy("time"));
+  onSnapshot(q,snap=>{
+    messages.innerHTML="";
+    snap.forEach(docSnap=>{
+      const msg=docSnap.data();
+      const div=document.createElement("div");
+      div.className="message "+(msg.sender===currentUser.uid?"me":"");
+      div.innerText=msg.text;
+      messages.appendChild(div);
+    });
+  });
+}
+
+window.sendMessage=async function(){
+  const text=messageInput.value;
+  const chatId=[currentUser.uid,selectedUser].sort().join("_");
+  await addDoc(collection(db,"chats",chatId,"messages"),{
+    text,
+    sender:currentUser.uid,
+    time:serverTimestamp()
+  });
+  messageInput.value="";
+};
