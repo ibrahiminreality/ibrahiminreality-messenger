@@ -37,7 +37,15 @@ const db = getFirestore(app);
 
 let currentChatUser = null;
 
-/* ========= AUTH ========= */
+function showSidebar(){
+  document.getElementById("sidebar").style.display = "block";
+  document.getElementById("chatArea").style.display = "none";
+}
+
+function showChat(){
+  document.getElementById("sidebar").style.display = "none";
+  document.getElementById("chatArea").style.display = "flex";
+}
 
 window.login = async () => {
   await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
@@ -58,6 +66,7 @@ window.register = async () => {
 
 window.logout = async () => {
   await signOut(auth);
+  showSidebar();
 };
 
 window.showRegister = () => {
@@ -76,15 +85,13 @@ window.showReset = () => {
   resetContainer.classList.remove("hidden");
 };
 
-/* ========= AUTH STATE ========= */
-
 onAuthStateChanged(auth, async (user) => {
   if (user) {
     authContainer.classList.add("hidden");
     registerContainer.classList.add("hidden");
     resetContainer.classList.add("hidden");
     mainApp.classList.remove("hidden");
-
+    showSidebar();
     loadUsers();
   } else {
     mainApp.classList.add("hidden");
@@ -92,28 +99,28 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-/* ========= LOAD USERS ========= */
-
 async function loadUsers() {
   userList.innerHTML = "";
-
   const querySnapshot = await getDocs(collection(db, "users"));
 
   querySnapshot.forEach(docSnap => {
     if (docSnap.id !== auth.currentUser.uid) {
       const div = document.createElement("div");
       div.innerText = docSnap.data().email;
-      div.onclick = () => openChat(docSnap.id, docSnap.data().email);
+
+      div.onclick = () => {
+        openChat(docSnap.id, docSnap.data().email);
+        showChat();
+      };
+
       userList.appendChild(div);
     }
   });
 }
 
-/* ========= CHAT ========= */
-
 function openChat(userId, email) {
   currentChatUser = userId;
-  chatHeader.innerText = email;
+  document.getElementById("chatUserName").innerText = email;
   loadMessages();
 }
 
