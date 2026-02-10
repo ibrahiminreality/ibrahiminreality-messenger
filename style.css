@@ -11,7 +11,7 @@ background:linear-gradient(135deg,#4e73df,#1cc88a);
 }
 
 .hidden{
-display:none;
+display:none !important;
 }
 
 /* AUTH */
@@ -58,9 +58,11 @@ cursor:pointer;
 /* MAIN */
 
 #mainApp{
-display:none;
 height:100vh;
+display:flex;
+flex-direction:column;
 }
+
 /* SIDEBAR */
 
 .sidebar{
@@ -80,10 +82,6 @@ cursor:pointer;
 font-size:16px;
 }
 
-.sidebar div:hover{
-background:#e0e0e0;
-}
-
 .sidebar button{
 width:100%;
 margin-top:15px;
@@ -98,7 +96,7 @@ border-radius:8px;
 
 .chatArea{
 flex:1;
-display:none;
+display:flex;
 flex-direction:column;
 background:white;
 }
@@ -145,21 +143,4 @@ background:#4e73df;
 color:white;
 border:none;
 border-radius:10px;
-}
-
-/* Desktop */
-
-@media(min-width:768px){
-#mainApp{
-display:flex;
-}
-
-.sidebar{
-width:30%;
-}
-
-.chatArea{
-display:flex;
-width:70%;
-}
 }
