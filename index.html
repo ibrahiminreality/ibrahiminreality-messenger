@@ -7,44 +7,43 @@
 </head>
 <body>
 
-<div class="auth-container" id="loginBox">
-  <h2>Login</h2>
-  <input type="email" id="loginEmail" placeholder="Email">
-  <input type="password" id="loginPassword" placeholder="Password">
-  <button onclick="login()">Login</button>
+<div class="container">
 
-  <p class="link" onclick="showRegister()">Register</p>
-  <p class="link" onclick="showReset()">Reset Password</p>
-</div>
-
-<div class="auth-container hidden" id="registerBox">
-  <h2>Register</h2>
-  <input type="text" id="registerName" placeholder="Name">
-  <input type="email" id="registerEmail" placeholder="Email">
-  <input type="password" id="registerPassword" placeholder="Password">
-  <button onclick="register()">Sign Up</button>
-
-  <p class="link" onclick="showLogin()">Back to Login</p>
-</div>
-
-<div class="auth-container hidden" id="resetBox">
-  <h2>Reset Password</h2>
-  <input type="email" id="resetEmail" placeholder="Email">
-  <button onclick="resetPassword()">Send Reset Link</button>
-
-  <p class="link" onclick="showLogin()">Back to Login</p>
-</div>
-
-<div id="homePage" class="hidden">
-  <div class="navbar">
-    <h3>Welcome</h3>
-    <button onclick="logout()">Sign Out</button>
+  <!-- LOGIN -->
+  <div id="loginBox" class="card">
+    <h2>Login</h2>
+    <input type="email" id="loginEmail" placeholder="Email">
+    <input type="password" id="loginPassword" placeholder="Password">
+    <button id="loginBtn">Login</button>
+    <p class="link" id="goRegister">Register</p>
+    <p class="link" id="goReset">Reset Password</p>
   </div>
 
-  <div class="home-content">
-    <h2>Dashboard</h2>
-    <p>Your profile loaded successfully.</p>
+  <!-- REGISTER -->
+  <div id="registerBox" class="card hidden">
+    <h2>Register</h2>
+    <input type="text" id="registerName" placeholder="Name">
+    <input type="email" id="registerEmail" placeholder="Email">
+    <input type="password" id="registerPassword" placeholder="Password">
+    <button id="registerBtn">Sign Up</button>
+    <p class="link" id="backLogin1">Back to Login</p>
   </div>
+
+  <!-- RESET -->
+  <div id="resetBox" class="card hidden">
+    <h2>Reset Password</h2>
+    <input type="email" id="resetEmail" placeholder="Email">
+    <button id="resetBtn">Send Reset Link</button>
+    <p class="link" id="backLogin2">Back to Login</p>
+  </div>
+
+  <!-- HOME -->
+  <div id="homeBox" class="card hidden">
+    <h2>Welcome</h2>
+    <p id="userName"></p>
+    <button id="logoutBtn">Logout</button>
+  </div>
+
 </div>
 
 <script type="module" src="app.js"></script>
