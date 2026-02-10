@@ -47,6 +47,7 @@ const messages = document.getElementById("messages");
 const chatHeader = document.getElementById("chatHeader");
 const messageInput = document.getElementById("messageInput");
 
+
 // ================= AUTH =================
 
 window.login = async () => {
@@ -88,23 +89,6 @@ window.logout = async () => {
   await signOut(auth);
 };
 
-// ================= UI SWITCH =================
-
-window.showRegister = () => {
-  authContainer.classList.add("hidden");
-  registerContainer.classList.remove("hidden");
-};
-
-window.showLogin = () => {
-  registerContainer.classList.add("hidden");
-  resetContainer.classList.add("hidden");
-  authContainer.classList.remove("hidden");
-};
-
-window.showReset = () => {
-  authContainer.classList.add("hidden");
-  resetContainer.classList.remove("hidden");
-};
 
 // ================= AUTH STATE =================
 
@@ -120,6 +104,7 @@ onAuthStateChanged(auth, async (user) => {
     authContainer.classList.remove("hidden");
   }
 });
+
 
 // ================= LOAD USERS =================
 
@@ -141,6 +126,7 @@ async function loadUsers() {
   });
 }
 
+
 // ================= OPEN CHAT =================
 
 function openChat(userId, email) {
@@ -154,10 +140,10 @@ function openChat(userId, email) {
   loadMessages();
 }
 
+
 // ================= LOAD MESSAGES =================
 
 function loadMessages() {
-  messages.innerHTML = "";
 
   const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
@@ -176,7 +162,7 @@ function loadMessages() {
       msg.innerText = data.text;
 
       if (data.sender === auth.currentUser.uid) {
-        msg.classList.add(".mymessage");
+        msg.classList.add("my-message");
       } else {
         msg.classList.add("other-message");
       }
@@ -184,10 +170,10 @@ function loadMessages() {
       messages.appendChild(msg);
     });
 
-    // Auto scroll
     messages.scrollTop = messages.scrollHeight;
   });
 }
+
 
 // ================= SEND MESSAGE =================
 
