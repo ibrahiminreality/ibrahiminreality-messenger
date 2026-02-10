@@ -49,12 +49,6 @@ border-radius:8px;
 font-size:16px;
 }
 
-.card p{
-margin-top:12px;
-color:#4e73df;
-cursor:pointer;
-}
-
 /* MAIN */
 
 #mainApp{
@@ -110,22 +104,46 @@ font-size:18px;
 
 #messages{
 flex:1;
-padding:16px;
+padding:15px;
 overflow-y:auto;
+background:#ece5dd;
+display:flex;
+flex-direction:column;
 }
 
-#messages div{
-margin-bottom:12px;
+/* MY MESSAGE */
+
+.my-message{
+background:#25d366;
+color:#000000;   /* কালো লেখা */
 padding:12px 16px;
-background:#f1f1f1;
-border-radius:12px;
+border-radius:15px 15px 0px 15px;
+margin-bottom:10px;
+align-self:flex-end;
 max-width:75%;
+font-size:16px;
+word-wrap:break-word;
+}
+
+/* OTHER MESSAGE */
+
+.other-message{
+background:#ffffff;
+color:#000000;
+padding:12px 16px;
+border-radius:15px 15px 15px 0px;
+margin-bottom:10px;
+align-self:flex-start;
+max-width:75%;
+font-size:16px;
+word-wrap:break-word;
 }
 
 .sendBox{
 display:flex;
 padding:12px;
 border-top:1px solid #ddd;
+background:white;
 }
 
 .sendBox input{
@@ -143,48 +161,4 @@ background:#4e73df;
 color:white;
 border:none;
 border-radius:10px;
-}
-/* MESSAGE STYLE */
-
-/* Chat Background */
-#messages {
-  background: #ece5dd;
-  padding: 15px;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-/* My Message */
-.my-message {
-  background: #25d366;
-  color: #ffffff;
-  padding: 10px 15px;
-  border-radius: 15px 15px 0px 15px;
-  margin-bottom: 8px;
-  align-self: flex-end;
-  max-width: 75%;
-  font-size: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-/* Other Message */
-.other-message {
-  background: #ffffff;
-  color: #000000;
-  padding: 10px 15px;
-  border-radius: 15px 15px 15px 0px;
-  margin-bottom: 8px;
-  align-self: flex-start;
-  max-width: 75%;
-  font-size: 15px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.08);
-}
-
-#messages div{
-padding:12px 16px;
-margin-bottom:10px;
-max-width:75%;
-font-size:16px;
-word-wrap:break-word;
 }
