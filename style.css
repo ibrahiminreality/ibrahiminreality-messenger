@@ -144,3 +144,26 @@ color:white;
 border:none;
 border-radius:10px;
 }
+/* MESSAGE STYLE */
+
+.myMessage{
+background:#4e73df;
+color:white;
+margin-left:auto;
+border-radius:18px 18px 4px 18px;
+}
+
+.otherMessage{
+background:#e4e6eb;
+color:black;
+margin-right:auto;
+border-radius:18px 18px 18px 4px;
+}
+
+#messages div{
+padding:12px 16px;
+margin-bottom:10px;
+max-width:75%;
+font-size:16px;
+word-wrap:break-word;
+}
