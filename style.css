@@ -147,21 +147,23 @@ border-radius:10px;
 /* MESSAGE STYLE */
 
 .my-message {
-  background: #4f6ef7;
+  background: #4e73df;
   color: #ffffff;
-  padding: 10px;
-  border-radius: 12px;
-  margin: 5px;
-  text-align: right;
+  padding: 10px 15px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  align-self: flex-end;
+  max-width: 75%;
 }
 
 .other-message {
   background: #e5e5e5;
   color: #000000;
-  padding: 10px;
-  border-radius: 12px;
-  margin: 5px;
-  text-align: left;
+  padding: 10px 15px;
+  border-radius: 15px;
+  margin-bottom: 10px;
+  align-self: flex-start;
+  max-width: 75%;
 }
 
 #messages div{
