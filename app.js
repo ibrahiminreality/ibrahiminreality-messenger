@@ -45,6 +45,7 @@ const mainApp = document.getElementById("mainApp");
 const userList = document.getElementById("userList");
 const messages = document.getElementById("messages");
 const chatHeader = document.getElementById("chatHeader");
+const messageInput = document.getElementById("messageInput");
 
 // ================= AUTH =================
 
@@ -175,14 +176,15 @@ function loadMessages() {
       msg.innerText = data.text;
 
       if (data.sender === auth.currentUser.uid) {
-        msg.classList.add("myMessage");
+        msg.classList.add("my-message");
       } else {
-        msg.classList.add("otherMessage");
+        msg.classList.add("other-message");
       }
 
       messages.appendChild(msg);
     });
 
+    // Auto scroll
     messages.scrollTop = messages.scrollHeight;
   });
 }
