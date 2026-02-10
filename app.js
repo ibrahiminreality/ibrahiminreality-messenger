@@ -1,26 +1,23 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-
 import {
   getAuth,
-  createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
-  sendPasswordResetEmail,
   signOut,
   onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 import {
   getFirestore,
-  doc,
-  setDoc,
-  getDoc,
   collection,
+  getDocs,
   addDoc,
   query,
   orderBy,
   onSnapshot,
   serverTimestamp,
-  updateDoc
+  doc,
+  updateDoc,
+  setDoc
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const firebaseConfig = {
@@ -38,65 +35,28 @@ const db = getFirestore(app);
 
 let currentChatUser = null;
 let unsubscribeMessages = null;
+let typingTimeout = null;
 
-// DOM
 const authContainer = document.getElementById("authContainer");
-const registerContainer = document.getElementById("registerContainer");
-const resetContainer = document.getElementById("resetContainer");
 const mainApp = document.getElementById("mainApp");
 const userList = document.getElementById("userList");
 const messages = document.getElementById("messages");
 const chatHeader = document.getElementById("chatHeader");
 const messageInput = document.getElementById("messageInput");
+const typingStatus = document.getElementById("typingStatus");
 
 
-// ================= AUTH =================
+// ================= LOGIN =================
 
 window.login = async () => {
-  try {
-    await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
-window.register = async () => {
-  try {
-    const userCred = await createUserWithEmailAndPassword(
-      auth,
-      registerEmail.value,
-      registerPassword.value
-    );
-
-    await setDoc(doc(db, "users", userCred.user.uid), {
-      email: registerEmail.value,
-      online: true,
-      lastSeen: serverTimestamp()
-    });
-
-  } catch (err) {
-    alert(err.message);
-  }
-};
-
-window.resetPassword = async () => {
-  try {
-    await sendPasswordResetEmail(auth, resetEmail.value);
-    alert("Reset email sent!");
-  } catch (err) {
-    alert(err.message);
-  }
+  await signInWithEmailAndPassword(auth, loginEmail.value, loginPassword.value);
 };
 
 window.logout = async () => {
-
-  if (auth.currentUser) {
-    await updateDoc(doc(db, "users", auth.currentUser.uid), {
-      online: false,
-      lastSeen: serverTimestamp()
-    });
-  }
-
+  await updateDoc(doc(db, "users", auth.currentUser.uid), {
+    online: false,
+    lastSeen: serverTimestamp()
+  });
   await signOut(auth);
 };
 
@@ -104,28 +64,15 @@ window.logout = async () => {
 // ================= AUTH STATE =================
 
 onAuthStateChanged(auth, async (user) => {
-
   if (user) {
 
-    const userRef = doc(db, "users", user.uid);
-    const userSnap = await getDoc(userRef);
-
-    if (!userSnap.exists()) {
-      await setDoc(userRef, {
-        email: user.email,
-        online: true,
-        lastSeen: serverTimestamp()
-      });
-    } else {
-      await updateDoc(userRef, {
-        online: true,
-        lastSeen: serverTimestamp()
-      });
-    }
+    await setDoc(doc(db, "users", user.uid), {
+      email: user.email,
+      online: true,
+      lastSeen: serverTimestamp()
+    }, { merge: true });
 
     authContainer.classList.add("hidden");
-    registerContainer.classList.add("hidden");
-    resetContainer.classList.add("hidden");
     mainApp.classList.remove("hidden");
 
     loadUsers();
@@ -134,7 +81,6 @@ onAuthStateChanged(auth, async (user) => {
     mainApp.classList.add("hidden");
     authContainer.classList.remove("hidden");
   }
-
 });
 
 
@@ -142,42 +88,34 @@ onAuthStateChanged(auth, async (user) => {
 
 function loadUsers() {
 
-  const q = collection(db, "users");
-
-  onSnapshot(q, (snapshot) => {
+  onSnapshot(collection(db, "users"), snapshot => {
 
     userList.innerHTML = "";
 
     snapshot.forEach(docSnap => {
 
-      if (!auth.currentUser) return;
-      if (docSnap.id === auth.currentUser.uid) return;
+      if (docSnap.id !== auth.currentUser.uid) {
 
-      const userData = docSnap.data();
-      const div = document.createElement("div");
+        const user = docSnap.data();
+        const div = document.createElement("div");
 
-      div.innerHTML = `
-        <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span>${userData.email}</span>
-          <span style="
-            width:10px;
-            height:10px;
-            border-radius:50%;
-            background:${userData.online ? '#2ecc71' : '#ccc'};
-          "></span>
-        </div>
-      `;
+        div.innerHTML = `
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span>${user.email}</span>
+            <small style="color:${user.online ? '#2ecc71' : '#aaa'}">
+              ${user.online ? 'Online' : 'Offline'}
+            </small>
+          </div>
+        `;
 
-      div.onclick = () => {
-        openChat(docSnap.id, userData.email);
-      };
+        div.onclick = () => openChat(docSnap.id, user.email);
 
-      userList.appendChild(div);
+        userList.appendChild(div);
+      }
 
     });
 
   });
-
 }
 
 
@@ -188,9 +126,7 @@ function openChat(userId, email) {
   currentChatUser = userId;
   chatHeader.innerText = email;
 
-  if (unsubscribeMessages) {
-    unsubscribeMessages();
-  }
+  if (unsubscribeMessages) unsubscribeMessages();
 
   loadMessages();
 }
@@ -199,8 +135,6 @@ function openChat(userId, email) {
 // ================= LOAD MESSAGES =================
 
 function loadMessages() {
-
-  if (!currentChatUser) return;
 
   const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
@@ -213,7 +147,7 @@ function loadMessages() {
 
     messages.innerHTML = "";
 
-    snapshot.forEach(docSnap => {
+    snapshot.forEach(async docSnap => {
 
       const data = docSnap.data();
       const msg = document.createElement("div");
@@ -222,18 +156,24 @@ function loadMessages() {
 
       if (data.sender === auth.currentUser.uid) {
         msg.classList.add("my-message");
+
+        if (data.seen) {
+          msg.innerHTML += " ✓✓";
+        }
+
       } else {
         msg.classList.add("other-message");
+
+        if (!data.seen) {
+          await updateDoc(docSnap.ref, { seen: true });
+        }
       }
 
       messages.appendChild(msg);
-
     });
 
     messages.scrollTop = messages.scrollHeight;
-
   });
-
 }
 
 
@@ -242,15 +182,63 @@ function loadMessages() {
 window.sendMessage = async () => {
 
   if (!currentChatUser) return;
-  if (!messageInput.value.trim()) return;
+  if (messageInput.value.trim() === "") return;
 
   const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
 
   await addDoc(collection(db, "chats", chatId, "messages"), {
     text: messageInput.value,
     sender: auth.currentUser.uid,
-    createdAt: serverTimestamp()
+    createdAt: serverTimestamp(),
+    seen: false
   });
 
   messageInput.value = "";
 };
+
+
+// ================= TYPING SYSTEM =================
+
+window.typing = async () => {
+
+  if (!currentChatUser) return;
+
+  const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+
+  await setDoc(doc(db, "typing", chatId), {
+    user: auth.currentUser.uid
+  });
+
+  clearTimeout(typingTimeout);
+
+  typingTimeout = setTimeout(async () => {
+    await setDoc(doc(db, "typing", chatId), { user: null });
+  }, 1500);
+};
+
+
+// ================= LISTEN TYPING =================
+
+onSnapshot(collection(db, "typing"), snapshot => {
+
+  snapshot.forEach(docSnap => {
+
+    const data = docSnap.data();
+
+    if (!currentChatUser) return;
+
+    const chatId = [auth.currentUser.uid, currentChatUser].sort().join("_");
+
+    if (docSnap.id === chatId) {
+
+      if (data.user === currentChatUser) {
+        typingStatus.innerText = "Typing...";
+      } else {
+        typingStatus.innerText = "";
+      }
+
+    }
+
+  });
+
+});
